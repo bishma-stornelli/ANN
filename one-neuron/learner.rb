@@ -1,12 +1,20 @@
 class Learner
 
-  attr_accessor :input_file, :outputs, :examples, :weights, :learning_rate
-  def initialize(input_file, learning_rate = 0.1)
+  attr_accessor :input_file, :outputs, 
+                :examples, :weights, 
+                :learning_rate, :log_file, 
+                :iteration, :max_iterations, 
+                :descent_learning_rate
+  def initialize(input_file, learning_rate = 0.1, descent_learning_rate = false, log_file = nil, max_iterations = 5000)
     @input_file = input_file
     @outputs = []
     @examples = []
     @weights = []
     @learning_rate = learning_rate
+    @log_file = log_file
+    @iteration = 0
+    @max_iterations = max_iterations
+    @descent_leraning_rate = descent_learning_rate
   end
   
   # Load file @input_file supposing that each line has an example with
@@ -46,6 +54,8 @@ class Learner
     end
   end
   
+  def 
+  
   def train
     raise NotImplementedError  
   end
@@ -67,4 +77,17 @@ class Learner
     return sum / 2  
   end
   
+  def log?
+    !@log_file.nil?
+  end
+  
+  def log
+    File.open(@log_file, "a") do |f|
+      f.write("#{@iteration},#{error},#{@weights.join(",")}\n")
+    end
+  end
+  
+  def descent_learning_rate?
+    descent_learning_rate
+  end
 end

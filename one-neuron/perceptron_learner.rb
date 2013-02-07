@@ -1,22 +1,21 @@
 class PerceptronLearner < Learner
   
   def train
-    @weights = Array.new(@examples[0].size){ |i| rand }
-    #@w0 = rand
+    @weights = Array.new(@examples[0].size){ |i| rand - rand }
+    @iteration = 1
+    while true do
     
-    1.upto(Float::INFINITY) do |i|
-    
-      all_learned = true
     
       examples.each_with_index do |example, j|
       
         output = evaluate( example )
         
-        all_learned &= update_weights(example, output, outputs[j])
+        update_weights(example, output, outputs[j])
         
       end
-      
-      break if all_learned
+      log if log?
+      break if error < 0.1 || @iteration > @max_iterations
+      @iteration = @iteration + 1
     end
   end
   
@@ -28,7 +27,6 @@ class PerceptronLearner < Learner
     weights.map!.with_index do |weight, index|
       weight + tmp * example[index]
     end
-    #@w0 += tmp
     false
   end
 end
