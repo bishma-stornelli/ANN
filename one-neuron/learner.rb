@@ -13,7 +13,7 @@ class Learner
     @examples = []
     @weights = []
     @learning_rate = learning_rate
-    @log_file = log_file
+    @log_file = log_file  
     @iteration = 0
     @max_iterations = max_iterations
     @descent_leraning_rate = descent_learning_rate
@@ -73,7 +73,7 @@ class Learner
   end
   
   def train
-    raise NotImplementedError  
+    raise NotImplementedError
   end
   
   def evaluate(example)
@@ -92,7 +92,7 @@ class Learner
       sum += (ops[i] - evaluate(e))**2
     end
     
-    return sum / 2  
+    return sum / exs.size.to_f
   end
   
   def log?

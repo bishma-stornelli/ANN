@@ -24,6 +24,7 @@ class PerceptronLearner < Learner
   def update_weights(example, current_output, expected_output)
     return true if current_output == expected_output
     tmp = learning_rate * ( expected_output - current_output )
+    tmp /= @iteration if descent_learning_rate?
     weights.map!.with_index do |weight, index|
       weight + tmp * example[index]
     end

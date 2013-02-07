@@ -1,0 +1,42 @@
+Resumen
+
+	En el presente proyecto 
+
+Detalles de implementacion / experimentacion
+
+	Descripcion de las clases:
+
+		Clase Learner: Dicha clase implementa todos los metodos necesarios para la neurona artificial y para su correcto funcionamiento. De esta clase derivan Perceptron y Adaline.
+
+			Atributos: 
+				Archivo de entrada de datos
+				Salidas que deberia dar la neurona
+				Ejemplos
+				Pesos
+				Tasa de aprendizaje
+				Archivo de reporte para ser graficado
+				Nro de iteracion
+				Nro maximo de iteraciones
+
+				Ejemplos de prueba
+				Resultados de los ejemplos de prueba
+			Funciones:
+				load_examples(normalize_data: boolean): Carga del archivo de entrada de datos los valores de entrenamiento y se llenan las variables de ejemplos y de salidas reales. Si los datos se desean que sean normalizados, mientras se cargan los datos y se guardan en las variables correspondientes se va seleccionando el valor minimo y el maximo y al final de la carga para todos los datos se realiza la cuenta X = (X - Xmin) / (Xmax - Xmin). De esta forma, todos los datos entran dentro del rango [0:1].
+				split_example(n: int): Funcion para dividir los datos en conjunto de entrenamiento y conjunto de prueba. La funcion escoge n valores aleatoriamente para ser trabajados con las funciones de la neurona Adaline para separar los conjuntos de prueba y de entrenamiento.
+				train: Funcion implementada en el Perceptron y en Adaline para el entrenamiento de la neurona.
+				evaluate(example: int[]): Funcion de normalizacion de la salida de la neurona. Realiza la sumatoria de la multiplicacion de los pesos con los atributos correspondientes. Si el resultado es mayor a 0, la funcion devuelve 1, de lo contrario devuelve -1.
+				error(exs: , ops: ): Funcion que calcula el error cuadratico medio. La funcion al final se divide entre el numero de ejemplos para normalizar los errores.
+				log(): Funcion para escribir los resultados en un archivo de texto para ser graficados. La funcion escribe los datos de la forma:
+					Nro iteracion, error, pesos de cada rasgo
+
+		Clase Perceptron_Learner: Implementa el Perceptron.
+			
+			Funciones:
+				train(): Funcion para entrenar el Perceptron. La funcion normaliza el resultado y si es distinto del resultado esperado actualiza los pesos. Los pesos estan inicializados aleatoriamente.
+				update_weights(example: int[], current_output: int[], expected_output: int[]): Esta funcion actualiza los pesos para la funcion de entrenamiento. Los pesos se actualizan solo si la salida real es igual a la esperada. Se utiliza la formula:
+					w <- w0  + learning_rate * (expected_output - current_output)
+
+
+
+
+Presentacion y discusion de los resultados
