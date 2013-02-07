@@ -1,7 +1,7 @@
 class DeltaLearner < Learner
   def train
     @weights = Array.new(@examples[0].size){ |i| rand - rand }
-
+    @weights_for_ninimum_error = @weights.dup
     @iteration = 1
     while true do
     
@@ -20,10 +20,18 @@ class DeltaLearner < Learner
       end
       
       weights.map!.with_index{ |w,j| w + delta_weight[j] }
+      
+      e = error
+      if e < @minimum_error 
+        @weights_for_minimum_error = @weights.dup
+        @minimum_error = e
+      end
+      
       log if log?
       break if error < 0.1 || @iteration > @max_iterations
       @iteration = @iteration + 1
     end
+    @weights = @weights_for_minimum_error
   end
   
 end

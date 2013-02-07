@@ -1,0 +1,17 @@
+El formato de los nombres de archivo para and, or y xor es:
+
+  <función>.data_<Learner>_<Se redujo la tasa de aprendizaje por iteración?>_<tasa de aprendizaje_inicial>.csv
+
+Para los bupa:
+
+  bupa_<Tamaño de cjto de entrenamiento>_<intento>.cvs
+
+  El intento es porque el cjto de entrenamiento se elige aleatoriamente. Se hicieron 3 corridas por cada uno para ver si habian diferencias significativas
+
+Para las salidas de los and, or y xor, el formato es:
+
+  iteracion,error,peso0,peso1,peso3
+
+Para las salidas de bupa el formato es:
+
+  iteracion,error_con_respecto_al_cjto_entrenamiento,error_con_respecto_al_cjto_prueba,pesos...

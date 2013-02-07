@@ -4,7 +4,9 @@ class Learner
                 :examples, :weights, 
                 :learning_rate, :log_file, 
                 :iteration, :max_iterations, 
-                :descent_learning_rate
+                :descent_learning_rate,
+                :test_examples,
+                :test_outputs
   def initialize(input_file, learning_rate = 0.1, descent_learning_rate = false, log_file = nil, max_iterations = 5000)
     @input_file = input_file
     @outputs = []
@@ -15,6 +17,10 @@ class Learner
     @iteration = 0
     @max_iterations = max_iterations
     @descent_leraning_rate = descent_learning_rate
+    @minimum_error = Float::INFINITY
+    @weights_for_minimum_error = []
+    @test_examples = nil
+    @test_outputs = nil
   end
   
   # Load file @input_file supposing that each line has an example with
@@ -54,7 +60,17 @@ class Learner
     end
   end
   
-  def 
+  def split_examples(n = 40)
+    @test_examples = @examples
+    @test_outputs = @outputs
+    @examples = []
+    @outputs = []
+    n.times do
+      i = rand @test_examples.size
+      @examples << @test_examples.delete_at(i)
+      @outputs << @test_outputs.delete_at(i)
+    end    
+  end
   
   def train
     raise NotImplementedError  
@@ -68,10 +84,12 @@ class Learner
     sum > 0 ? 1 : -1
   end
   
-  def error
+  def error(exs = nil, ops = nil)
+    exs ||= examples
+    ops ||= outputs
     sum = 0
-    examples.each_with_index do |e, i|
-      sum += (outputs[i] - evaluate(e))**2
+    exs.each_with_index do |e, i|
+      sum += (ops[i] - evaluate(e))**2
     end
     
     return sum / 2  
@@ -83,7 +101,7 @@ class Learner
   
   def log
     File.open(@log_file, "a") do |f|
-      f.write("#{@iteration},#{error},#{@weights.join(",")}\n")
+      f.write("#{@iteration},#{error}#{@test_examples.nil? ? "" : ",#{error(@test_examples, @test_outputs)}"},#{@weights.join(",")}\n")
     end
   end
   
