@@ -92,7 +92,7 @@ class Learner
       sum += (ops[i] - evaluate(e))**2
     end
     
-    return sum / 2  
+    return sum / exs.size.to_f
   end
   
   def log?
