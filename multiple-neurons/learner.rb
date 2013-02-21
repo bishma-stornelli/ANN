@@ -30,7 +30,7 @@ class Learner
     :testing_examples, :testing_outputs,
     :n_features, :n_hidden, :weights
   attr_accessor :learning_rate, :max_iterations, :error_tolerance
-  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 50000, error_tolerance = 0.01)
+  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 1000, error_tolerance = 0.01)
     @n_features = n_features
     @n_hidden = n_hidden
     @learning_rate = learning_rate
@@ -75,19 +75,26 @@ class Learner
   end
 
   def train
-    weights = initialize_weights
+    @weights = initialize_weights
+#    puts "Pesos inicializados a #{weights.inspect}"
+#    sleep 5
     iteration = 0
     while error(training_examples, training_outputs) > 0.01 || iteration < max_iterations do
+       puts "Iteracion #{iteration}"
+#      puts "Pesos #{weights.inspect}"
+#       puts "Error #{error(training_examples, training_outputs)}"
+#      sleep 2
       training_examples.each_with_index do |ei, i|
         lambdas = Array.new
         
         o = evaluate(ei)
-        for k in output_neurons do
-          lambdas[k] = o[k] * (1 - o[k] ) * (outputs[i] - o[k] )        
+        for k in @output_neurons do
+          lambdas[k] = o[k] * (1 - o[k] ) * (@training_outputs[i] - o[k] )        
         end 
 
-        for h in hidden_neurons do          
-          lambdas[h] = o[h] * (1 - o[h]) * output_neurons.sum {|k| w[k][h] * lambdas[k]}
+        for h in @hidden_neurons do
+#          puts o.inspect
+          lambdas[h] = o[h] * (1 - o[h]) * @output_neurons.inject(0) {|acc, k| acc + @weights[k][h] * lambdas[k]}
         end
         
         update_weights(lambdas, o)
@@ -100,21 +107,25 @@ class Learner
   # returns an array such that o[k] is the output for neuron k
   # o tiene que tener las posiciones definidas para las neuronas de entrada tambien (TODAS)
   def evaluate(example)
-    o = []
+    o = example.dup
     tmp = 0
     
-    hidden_neurons.each do |h|
-      input_neurons.each do |k|
-        tmp = tmp + weights[h][k]*example
+    @hidden_neurons.each do |h|
+      @input_neurons.each do |k|
+        #puts example.inspect
+        #puts @weights.inspect
+        tmp = tmp + @weights[h][k] * example[k]
       end
       o[h] = sig(tmp)
     end
 
     tmp = 0
 
-    output_neurons.each do |h|
-      hidden_neurons.each do |k|
-        tmp = tmp + weights[h][k]*o[k]
+    @output_neurons.each do |h|
+      @hidden_neurons.each do |k|
+        #puts "Intentando acceder al peso #{h} , #{k}"
+        #sleep 5
+        tmp = tmp + @weights[h][k]*o[k]
       end
       o[h] = sig(tmp)
     end
@@ -123,21 +134,21 @@ class Learner
 
   def sig(x)
     e = 2.71828
-    1/(1 - e^x)
+    1/(1 - e**x)
   end
 
   # Calculate the error in examples with respect to the expected
   # outputs outputs
   def error(examples, outputs)
-    outputs.each_with_index.inject(0) { |acc, (output, index)| acc + (output - evaluate(examples[index]))**2 } / outputs.size
+    outputs.each_with_index.inject(0) { |acc, (output, index)| acc + (output - evaluate(examples[index]).last)**2 } / outputs.size
   end  
   
-  def load_training_examples(file_path, output_map = {})
-    load_examples(@training_examples, @training_outputs, file_path, output_map)
+  def load_training_examples(file_path, output_map = {}, sep = ",")
+    load_examples(@training_examples, @training_outputs, file_path, output_map, sep)
   end
   
-  def load_testing_examples(file_path, output_map = {})
-    load_examples(@testing_examples, @testing_outputs, file_path, output_map)
+  def load_testing_examples(file_path, output_map = {}, sep = ",")
+    load_examples(@testing_examples, @testing_outputs, file_path, output_map, sep)
   end
   
   private
@@ -150,11 +161,11 @@ class Learner
   # It stores the inputs in the inputs variable and the outputs in the 
   # outputs variable (they must be initialized before calling this method).
   def load_examples(inputs, outputs, file_path, output_map = {}, separator = ",")
-    File.open(@input_file, "r") do |infile|
+    File.open(file_path, "r") do |infile|
       while (line = infile.gets)
         tmp = line.split(separator)
         tmp[n_features] = output_map[tmp[n_features]].nil? ? tmp[n_features] : output_map[tmp[n_features]]
-        tmp.map{|a| a.to_f}
+        tmp.map!{|a| a.to_f}
         outputs << tmp[n_features]
         inputs << tmp[0,n_features]
       end
@@ -163,15 +174,15 @@ class Learner
 
   # Update weights with the differences in lambdas
   def update_weights(lambdas, o)
-    hidden_neurons.each do |h|
-      input_neurons.each do |k|
-        weights[h][k] = weights[h][k] + learning_rate*lambdas[h]*o[k]
+    @hidden_neurons.each do |h|
+      @input_neurons.each do |k|
+        @weights[h][k] = @weights[h][k] + learning_rate*lambdas[h]*o[k]
       end
     end
 
-    output_neurons.each do |h|
-      hidden_neurons.each do |k|
-        weights[h][k] = weights[h][k] + learning_rate*lambdas[h]*o[k]
+    @output_neurons.each do |h|
+      @hidden_neurons.each do |k|
+        @weights[h][k] = @weights[h][k] + learning_rate*lambdas[h]*o[k]
       end
     end 
   end  
@@ -180,13 +191,13 @@ class Learner
   # returns an array such that w[i][j] is the weight from neuron j to i
   def initialize_weights
     w = Array.new( n_features + n_hidden + 1 , [] )
-    input_neurons.each do |i|
-      hidden_neurons.each do |h|
+    @input_neurons.each do |i|
+      @hidden_neurons.each do |h|
         w[h][i] = rand
       end
     end
-    hidden_neurons.each do |h|
-      output_neurons.each do |o|
+    @hidden_neurons.each do |h|
+      @output_neurons.each do |o|
         w[o][h] = rand
       end
     end

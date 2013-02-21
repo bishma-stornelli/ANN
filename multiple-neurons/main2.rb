@@ -1,4 +1,4 @@
-require 'learner'
+require './learner'
 
 begin
   # Look the best combination for each file
@@ -7,8 +7,8 @@ begin
     %w(input/datos_r6_n500.txt input/datos_r6_n1000.txt input/datos_r6_n2000.txt input/own_500 input/own_1000 input/own_2000).each do |file_path|
       [0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95, 0.99].each do |learning_rate|
         l = Learner.new(2, n_hidden, learning_rate)
-        l.load_training_examples(file_path, {"1" => "1", "-1" => "0"})
-        l.load_testing_examples('input/own_10000', {"1" => "1", "-1" => "0"})
+        l.load_training_examples(file_path, {"1" => "1", "-1" => "0"}, " ")
+        l.load_testing_examples('input/own_10000', {"1" => "1", "-1" => "0"}, " ")
         l.train
         
         bests[file_path] = {
