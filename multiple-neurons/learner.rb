@@ -118,6 +118,7 @@ class Learner
       end
       o[h] = sig(tmp)
     end
+    o
   end
 
   def sig(x)
