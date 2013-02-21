@@ -56,9 +56,24 @@ class Learner
   #    randomly and uniformly (half classified 0 and half classified 1) (good)
   # param percentage is a float between 0 and 1
   def split_examples(percentage)
+    train_examples = @training_examples
+    test_examples = @testing_examples
+    train_outputs = @training_outputs
+    test_outputs = @testing_outputs
+    @training_examples = []
+    @test_examples = []
+    @training_outputs = []
+    @testing_outputs = []
+    n = (train_examples.size*percentage).round
+    n.times do
+      i = rand @train_examples.size
+      @testing_examples << train_examples.delete_at(i)
+      @testing_outputs << train_outputs.delete_at(i)
+    end
+    @training_examples = train_examples
+    @training_outputs = train_outputs
   end
 
-  
   def train
     weights = initialize_weights
     iteration = 0
@@ -72,18 +87,42 @@ class Learner
         end 
 
         for h in hidden_neurons do          
-          lambdas[h] = o[h] * (1 - o[h]) * output_neurons.sum {|k| w[k][h] * lambda[k]}
+          lambdas[h] = o[h] * (1 - o[h]) * output_neurons.sum {|k| w[k][h] * lambdas[k]}
         end
         
-        update_weights(lambdas)
+        update_weights(lambdas, o)
       end
       iteration += 1
     end
   end
 
   # Evaluate the input example with the current weights and
-  # returns an array such that o[k] is the output for neuron k 
+  # returns an array such that o[k] is the output for neuron k
+  # o tiene que tener las posiciones definidas para las neuronas de entrada tambien (TODAS)
   def evaluate(example)
+    o = []
+    tmp = 0
+    
+    hidden_neurons.each do |h|
+      input_neurons.each do |k|
+        tmp = tmp + weights[h][k]*example
+      end
+      o[h] = sig(tmp)
+    end
+
+    tmp = 0
+
+    output_neurons.each do |h|
+      hidden_neurons.each do |k|
+        tmp = tmp + weights[h][k]*o[k]
+      end
+      o[h] = sig(tmp)
+    end
+  end
+
+  def sig(x)
+    e = 2.71828
+    1/(1 - e^x)
   end
 
   # Calculate the error in examples with respect to the expected
@@ -109,12 +148,31 @@ class Learner
   # {"1" => "1", "2" => "0"} for example).
   # It stores the inputs in the inputs variable and the outputs in the 
   # outputs variable (they must be initialized before calling this method).
-  def load_examples(inputs, outputs, file_path, output_map = {})
-  
+  def load_examples(inputs, outputs, file_path, output_map = {}, separator = ",")
+    File.open(@input_file, "r") do |infile|
+      while (line = infile.gets)
+        tmp = line.split(separator)
+        tmp[n_features] = output_map[tmp[n_features]].nil? ? tmp[n_features] : output_map[tmp[n_features]]
+        tmp.map{|a| a.to_f}
+        outputs << tmp[n_features]
+        inputs << tmp[0,n_features]
+      end
+    end
   end
-  
+
   # Update weights with the differences in lambdas
-  def update_weights(lambdas)
+  def update_weights(lambdas, o)
+    hidden_neurons.each do |h|
+      input_neurons.each do |k|
+        weights[h][k] = weights[h][k] + learning_rate*lambdas[h]*o[k]
+      end
+    end
+
+    output_neurons.each do |h|
+      hidden_neurons.each do |k|
+        weights[h][k] = weights[h][k] + learning_rate*lambdas[h]*o[k]
+      end
+    end 
   end  
   
   # Initialize the weights of the network randomly
