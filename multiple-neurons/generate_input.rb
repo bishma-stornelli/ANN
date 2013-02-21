@@ -53,8 +53,8 @@ def generate_test_examples(file_name)
 end
 
 begin
-  generate_test_examples("outputs/own_10000")
-  generate_input("outputs/own_500", 500)
-  generate_input("outputs/own_1000", 1000)
-  generate_input("outputs/own_2000", 2000)
+  generate_test_examples("input/own_10000")
+  generate_input("input/own_500", 500)
+  generate_input("input/own_1000", 1000)
+  generate_input("input/own_2000", 2000)
 end
