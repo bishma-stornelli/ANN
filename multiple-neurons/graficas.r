@@ -1,47 +1,10 @@
 # Graficas Proy 1 Inteligencia
 
-# AND FALSE
-Iteraciones <- c(1,2,3,4,5,6,7)
-
-#tasa 0.99
-error3 <- c(2,0,0,0,0,0,0)
-plot(Iteraciones, error3, main= "Perceptron, Función AND", xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue")
-lines(Iteraciones, error3, col = "darkblue")
-#tasa 0.05
-error2 <- c(1,0,0,0,0,0,0)
-points(Iteraciones, error2, col ="red" )
-lines(Iteraciones, error2, col = "red")
-# AND tasa 0.01
-ErrorAnD1 <- c(1,1,1,1,1,1,0)
-points(Iteraciones, ErrorAnD1, col= "green")
-lines(Iteraciones, ErrorAnD1, col = "green")
-#tasa 0.1
-error4 <- c(0,0,0,0,0,0,0)
-points(Iteraciones, error4, col= "orange")
-lines(Iteraciones, error4, col = "orange")
-legend("topright", inset=.02, title="Tasas de Entrenamiento",
-  	 c("0.99","0.05, 0.4","0.01","0.1, 0.2, 0.3, 0.5"),fill= c("darkblue", "red", "green", "orange") , horiz=FALSE)
-
 #########################
-# Perceptron OR false
-# tasa 0.01
+# Multicapa 
 dataOR1 <- read.table(file="or.data_PerceptronLearner_false_0.01.cvs", header= FALSE, sep=",")
 plot(dataOR1[,1], dataOR1[,2], main="Perceptrón, Función OR", xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue")
 lines(dataOR1[,1], dataOR1[,2], col="darkblue")
-# tasa 0.1
-dataOR2 <- read.table(file="or.data_PerceptronLearner_false_0.1.cvs", header= FALSE, sep=",")
-points(dataOR2[,1], dataOR2[,2], col = "red")
-lines(dataOR2[,1], dataOR2[,2], col = "red")
-# tasa 0.2
-dataOR3 <- read.table(file="or.data_PerceptronLearner_false_0.2.cvs", header= FALSE, sep=",")
-points(dataOR3[,1], dataOR3[,2], col = "green")
-lines(dataOR3[,1], dataOR3[,2], col = "green")
-# tasa 0.3
-dataOR4 <- read.table(file="or.data_PerceptronLearner_false_0.3.cvs", header= FALSE, sep=",")
-points(dataOR4[,1], dataOR4[,2], col = "orange")
-lines(dataOR4[,1], dataOR4[,2], col = "orange")
-legend("topright", inset=.02, title="Tasas de Entrenamiento",
-  	 c("0.01","0.1, 0.05","0.2, 0.4, 0.5, 0.99","0.3"),fill= c("darkblue", "red", "green", "orange") , horiz=FALSE)
   	 
 ##################
 

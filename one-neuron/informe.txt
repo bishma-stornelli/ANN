@@ -1,6 +1,6 @@
 Resumen
 
-	En el presente proyecto 
+	El presente proyecto se trata de una implementacion de las neuronas artificiales Perceptron y Adaline, con las cuales se hacen pruebas para analisis de convergencia segun las funciones de entrenamiento. En este informe se discuten los resultados obtenidos de las funciones AND, OR y XOR, y ademas de los datos de prueba de Liver Disorders Data Set.
 
 Detalles de implementacion / experimentacion
 
@@ -36,7 +36,10 @@ Detalles de implementacion / experimentacion
 				update_weights(example: int[], current_output: int[], expected_output: int[]): Esta funcion actualiza los pesos para la funcion de entrenamiento. Los pesos se actualizan solo si la salida real es igual a la esperada. Se utiliza la formula:
 					w <- w0  + learning_rate * (expected_output - current_output)
 
+		Clase Delta_Learner: Implementa el Adaline.
 
+			Funciones:
+				train(): Funcion para entrenar el Adaline. Implementacion del algoritmo de descenso del gradiente.
 
 
 Presentacion y discusion de los resultados

@@ -15,7 +15,7 @@ begin
             :n_hidden => -1, 
             :learning_rate => -1, 
             :error => {
-              :testing => Float::INFINITY, :training => Float::INFINITY 
+              :testing => Float::INFINITY, :training => Float::INFINITY
             },
             :learner => nil
           } if bests[file_path].nil?

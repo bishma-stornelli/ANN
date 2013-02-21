@@ -69,7 +69,7 @@ class Learner
       i = rand @test_examples.size
       @examples << @test_examples.delete_at(i)
       @outputs << @test_outputs.delete_at(i)
-    end    
+    end
   end
   
   def train

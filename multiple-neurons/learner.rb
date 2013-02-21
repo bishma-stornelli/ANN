@@ -30,7 +30,7 @@ class Learner
     :testing_examples, :testing_outputs,
     :n_features, :n_hidden, :weights
   attr_accessor :learning_rate, :max_iterations, :error_tolerance
-  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 1000, error_tolerance = 0.01)
+  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 10000, error_tolerance = 0.01)
     @n_features = n_features
     @n_hidden = n_hidden
     @learning_rate = learning_rate
@@ -79,12 +79,12 @@ class Learner
 #    puts "Pesos inicializados a #{weights.inspect}"
 #    sleep 5
     iteration = 0
-    while error(training_examples, training_outputs) > 0.01 || iteration < max_iterations do
+    while (error(@training_examples, @training_outputs) > 0.01 && iteration < @max_iterations) do
        puts "Iteracion #{iteration}"
 #      puts "Pesos #{weights.inspect}"
 #       puts "Error #{error(training_examples, training_outputs)}"
 #      sleep 2
-      training_examples.each_with_index do |ei, i|
+      @training_examples.each_with_index do |ei, i|
         lambdas = Array.new
         
         o = evaluate(ei)
