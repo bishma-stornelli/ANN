@@ -69,6 +69,7 @@ class Learner
 
   def train
     @weights = initialize_weights
+    report = []
 
     iteration = 0
     
@@ -101,6 +102,7 @@ class Learner
       #  return
       #end
       past_e = e
+      report << [iteration, e]
       #sleep 0.2
       if iteration % 100 == 0
         puts "> #{iteration}, Correct = #{correct}/#{@training_outputs.size}"
@@ -108,6 +110,7 @@ class Learner
       
       iteration += 1
     end
+    report
   end
 
   # Evaluate the input example with the current weights and
