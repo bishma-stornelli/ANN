@@ -30,7 +30,7 @@ class Learner
     :testing_examples, :testing_outputs,
     :n_features, :n_hidden, :weights
   attr_accessor :learning_rate, :max_iterations, :error_tolerance
-  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 10000, error_tolerance = 0.01)
+  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 100, error_tolerance = 0.01)
     @n_features = n_features
     @n_hidden = n_hidden
     @learning_rate = learning_rate
