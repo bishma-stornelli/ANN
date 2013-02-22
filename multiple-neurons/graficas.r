@@ -70,181 +70,48 @@ legend("topright", inset=.02, title="Tipos de puntos", c("En circulo","En cuadra
 dev.off()
 
 ########### Pregunta 3
-# Bupa data corte 40 error entren
-par(mfrow=c(1,3))
-dataB <- read.table(file="b_40_0.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 40 Ejs, Corrida 0",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_40_0.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
-# error entrenamiento
-dataB <- read.table(file="b_40_1.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 40 Ejs, Corrida 1",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de pueba
-dataB <- read.table(file="b_40_1.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
-# error de entrenamiento
-dataB <- read.table(file="b_40_2.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 40 Ejs, Corrida 2",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de pueba
-dataB <- read.table(file="b_40_2.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
-     
-## ADALINE 80 ejemplo
-# Bupa data corte 40 error entren
-par(mfrow=c(1,3))
-## ADaline 80, 0
-dataB <- read.table(file="b_80_0.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 80 Ejs, Corrida 0",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_80_0.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
-     
-## Adaline 80, 1
-dataB <- read.table(file="b_80_1.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 80 Ejs, Corrida 1",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_80_1.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
 
-##adaline 80 ,2
-dataB <- read.table(file="b_80_2.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 80 Ejs, Corrida 2",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
+jpeg('bupa0.5.jpg')
+dataB <- read.table(file="bupa_0.5", header= FALSE, sep=",")
+plot(dataB[,1], dataB[,2], main="Bupa Data al 50%",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(0, 2), xlim=c(0,1000), pch = 20)
 lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_80_2.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
-         
-################ ADALINE 120 EJEMPLOS
-## ADALINE 120 ejemplo
-# Bupa data corte 40 error entren
-par(mfrow=c(1,3))
-## ADaline 120, 0
-dataB <- read.table(file="b_120_0.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 120 Ejs, Corrida 0",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_120_0.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
-     
-## Adaline 120, 1
-dataB <- read.table(file="b_120_1.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 120 Ejs, Corrida 1",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_120_1.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
 
-##adaline 120 ,2
-dataB <- read.table(file="b_120_2.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 120 Ejs, Corrida 2",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_120_2.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
-         
-## ADALINE 160 ejemplos
+dev.off()
 
-# Bupa data corte 40 error entren
-par(mfrow=c(1,3))
-## ADaline 160, 0
-dataB <- read.table(file="b_160_0.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 160 Ejs, Corrida 0",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_160_0.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
-     
-## Adaline 160, 1
-dataB <- read.table(file="b_160_1.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 160 Ejs, Corrida 1",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_160_1.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
+###########
 
-##adaline 160 ,2
-dataB <- read.table(file="b_160_2.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 160 Ejs, Corrida 2",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
+jpeg('bupa0.6.jpg')
+dataB <- read.table(file="bupa_0.6", header= FALSE, sep=",")
+plot(dataB[,1], dataB[,2], main="Bupa Data al 60%",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(0, 2), xlim=c(0,1000), pch = 20)
 lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_160_2.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
 
-##### 
-## ADALINE 200 ejemplo
-# Bupa data corte 40 error entren
-par(mfrow=c(1,3))
-## ADaline 200, 0
-dataB <- read.table(file="b_200_0.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 200 Ejs, Corrida 0",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_200_0.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
-     
-## Adaline 200, 1
-dataB <- read.table(file="b_200_1.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 200 Ejs, Corrida 1",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
-lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_200_1.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
+dev.off()
 
-##adaline 200 ,2
-dataB <- read.table(file="b_200_2.csv", header= FALSE, sep=",")
-plot(dataB[,1], dataB[,2], main="Adaline, 200 Ejs, Corrida 2",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(1, 3), xlim=c(1,25))
+###########
+
+jpeg('bupa0.7.jpg')
+dataB <- read.table(file="bupa_0.7", header= FALSE, sep=",")
+plot(dataB[,1], dataB[,2], main="Bupa Data al 70%",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(0, 2), xlim=c(0,1000), pch = 20)
 lines(dataB[,1], dataB[,2], col="darkblue")
-# error de prueba
-dataB <- read.table(file="b_200_2.csv", header= FALSE, sep=",")
-points(dataB[,1], dataB[,3], col = "red")
-lines(dataB[,1], dataB[,3], col = "red")
-legend("topright", inset=.02, title="Tipo de Error",
-     c("Error de Entrenamiento", "Error de Prueba"),fill= c("darkblue","red") , horiz=FALSE)
+
+dev.off()
+
+###########
+
+jpeg('bupa0.8.jpg')
+dataB <- read.table(file="bupa_0.8", header= FALSE, sep=",")
+plot(dataB[,1], dataB[,2], main="Bupa Data al 80%",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(0, 2), xlim=c(0,1000), pch = 20)
+lines(dataB[,1], dataB[,2], col="darkblue")
+
+dev.off()
+
+###########
+
+jpeg('bupa0.9.jpg')
+dataB <- read.table(file="bupa_0.9", header= FALSE, sep=",")
+plot(dataB[,1], dataB[,2], main="Bupa Data al 90%",xlab="Iteraciones", ylab="Error",col = "darkblue", col.main="blue", ylim=c(0, 2), xlim=c(0,1000), pch = 20)
+lines(dataB[,1], dataB[,2], col="darkblue")
+
+dev.off()
+
+
