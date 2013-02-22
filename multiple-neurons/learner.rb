@@ -28,11 +28,12 @@ class Learner
   #     en la capa de salida (por ahora solo es una neurona de salida y su valor sera [n_features + n_hidden])
   attr_reader :training_examples, :training_outputs,
     :testing_examples, :testing_outputs,
-    :n_features, :n_hidden, :weights
+    :n_features, :n_hidden, :weights,
+    :input_neurons, :hidden_neurons, :output_neurons
   attr_accessor :learning_rate, :max_iterations, :error_tolerance
   def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 5000, error_tolerance = 0.01)
-    @n_features = n_features
-    @n_hidden = n_hidden
+    @n_features = n_features + 1
+    @n_hidden = n_hidden + 1
     @learning_rate = learning_rate
     @weights = []
     @training_examples = []
@@ -41,9 +42,9 @@ class Learner
     @training_outputs = []
     @testing_outputs = []
     @raw_outputs = []
-    @input_neurons = Array.new(n_features){ |i| i }
-    @hidden_neurons = Array.new(n_hidden){ |i| n_features + i }
-    @output_neurons = [n_features + n_hidden]
+    @input_neurons = Array.new(@n_features){ |i| i }
+    @hidden_neurons = Array.new(@n_hidden){ |i| @n_features + i }
+    @output_neurons = [@n_features + @n_hidden]
     @max_iterations = max_iterations
     @error_tolerance = error_tolerance
   end
@@ -56,68 +57,55 @@ class Learner
   #    randomly and uniformly (half classified 0 and half classified 1) (good)
   # param percentage is a float between 0 and 1
   def split_examples(percentage)
-    train_examples = @training_examples
-    test_examples = @testing_examples
-    train_outputs = @training_outputs
-    test_outputs = @testing_outputs
-    @training_examples = []
-    @test_examples = []
-    @training_outputs = []
+    @testing_examples = []
     @testing_outputs = []
-    n = (train_examples.size*percentage).round
+    n = (@training_examples.size*percentage).round
     n.times do
-      i = rand @train_examples.size
-      @testing_examples << train_examples.delete_at(i)
-      @testing_outputs << train_outputs.delete_at(i)
+      i = rand @training_examples.size
+      @testing_examples << @training_examples.delete_at(i)
+      @testing_outputs << @training_outputs.delete_at(i)
     end
-    @training_examples = train_examples
-    @training_outputs = train_outputs
   end
 
   def train
     @weights = initialize_weights
-#    puts "Pesos inicializados a #{weights.inspect}"
-#    sleep 5
+
     iteration = 0
     
     e = Float::INFINITY
     past_e = e
-    while (e > 0.01 && iteration < @max_iterations) do
-#       puts "Iteracion #{iteration}"
-#      puts "Pesos #{weights.inspect}"
-#       puts "Error #{error(training_examples, training_outputs)}"
-#      sleep 2
+
+    while (e > @error_tolerance && iteration < @max_iterations) do
       e = 0
-      # Orden 500
+      correct = 0
       @training_examples.each_with_index do |ei, i|
         lambdas = Array.new
         
-        # Orden
         o = evaluate(ei)
-        #puts o.inspect
-        # Orden 1
+        correct += 1 if o.last.round == @training_outputs[i]
+
         for k in @output_neurons do
           lambdas[k] = o[k] * (1 - o[k] ) * (@training_outputs[i] - o[k] )        
         end 
 
-        # Orden n_hidden
         for h in @hidden_neurons do
-#          puts o.inspect
           lambdas[h] = o[h] * (1 - o[h]) * @output_neurons.inject(0) {|acc, k| acc + @weights[k][h] * lambdas[k]}
         end
         
-        # Update error
         e += ((@training_outputs[i] - o.last)**2) / @training_outputs.size
 
-        
-        # Orden 30
         update_weights(lambdas, o)
       end
-      if (past_e - e).abs <= 0.000001
-        return
-      end
+      #puts "#{past_e} - #{e} = #{(past_e - e).abs}"
+      #if (past_e - e).abs <= 0.000000001
+      #  return
+      #end
       past_e = e
       #sleep 0.2
+      if iteration % 100 == 0
+        puts "> #{iteration}, Correct = #{correct}/#{@training_outputs.size}"
+      end
+      
       iteration += 1
     end
   end
@@ -126,14 +114,11 @@ class Learner
   # returns an array such that o[k] is the output for neuron k
   # o tiene que tener las posiciones definidas para las neuronas de entrada tambien (TODAS)
   def evaluate(example)
-    outs = example.dup
-    
+    outs = example.dup    
     
     @hidden_neurons.each do |h|
       tmp = 0
       @input_neurons.each do |i|
-        #puts example.inspect
-        #puts @weights.inspect
         tmp = tmp + @weights[h][i] * outs[i]
       end
       outs[h] = sig(tmp)
@@ -142,26 +127,23 @@ class Learner
     @output_neurons.each do |o|
       tmp = 0
       @hidden_neurons.each do |h|
-        #puts "Intentando acceder al peso #{h} , #{k}"
-        #sleep 5
         tmp = tmp + @weights[o][h] * outs[h]
       end
       outs[o] = sig(tmp)
     end
-    #puts outs.inspect
-    #sleep 2
     outs
   end
 
   def sig(x)
-    e = 2.71828
-    1.0/(1 + e**(-x))
+    1.0 / (1.0 + Math.exp(-x))
   end
 
   # Calculate the error in examples with respect to the expected
   # outputs outputs
   def error(examples, outputs)
-    outputs.each_with_index.inject(0) { |acc, (output, index)| acc + (output - evaluate(examples[index]).last)**2 } / 2
+    outputs.each_with_index.inject(0) do |acc, (output, index)| 
+      acc + ((output - evaluate(examples[index]).last)**2 ) / outputs.size
+    end
   end  
   
   def load_training_examples(file_path, output_map = {}, sep = ",")
@@ -172,7 +154,7 @@ class Learner
     load_examples(@testing_examples, @testing_outputs, file_path, output_map, sep)
   end
   
-  private
+  
   
   # Load the examples from the file file_path taking the first n_features 
   # (from 0 to n_features) columns as features and 
@@ -185,10 +167,10 @@ class Learner
     File.open(file_path, "r") do |infile|
       while (line = infile.gets)
         tmp = line.split(separator)
-        tmp[n_features] = output_map[tmp[n_features]].nil? ? tmp[n_features] : output_map[tmp[n_features]]
+        tmp[n_features - 1 ] = output_map[tmp[n_features - 1]].nil? ? tmp[n_features - 1] : output_map[tmp[n_features - 1]]
         tmp.map!{|a| a.to_f}
-        outputs << tmp[n_features]
-        inputs << tmp[0,n_features]
+        outputs << tmp[n_features - 1]
+        inputs << (tmp[0,n_features - 1].concat([1.0]))
       end
     end
   end
@@ -212,7 +194,8 @@ class Learner
   # Initialize the weights of the network randomly
   # returns an array such that w[i][j] is the weight from neuron j to i
   def initialize_weights
-    w = Array.new( n_features + n_hidden + 1 , [] )
+    w = Array.new( n_features + n_hidden + 1 )
+    w.map! {|e| [] }
     @input_neurons.each do |i|
       @hidden_neurons.each do |h|
         w[h][i] = (rand - rand) * 0.2
@@ -220,7 +203,7 @@ class Learner
     end
     @hidden_neurons.each do |h|
       @output_neurons.each do |o|
-        w[o][h] = (rand - rand) * 2
+        w[o][h] = (rand - rand) * 5
       end
     end
     w

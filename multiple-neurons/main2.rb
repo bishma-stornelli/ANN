@@ -50,7 +50,7 @@ begin
     l.training_examples.each do |e|
       o = e.dup
       o << l.evaluate(e).last
-      f = o.last == 0 ? f1 : f2
+      f = o.last.round == 0 ? f1 : f2
       f.write("#{o.join(",")}\n")
     end
     f1.close
