@@ -30,7 +30,7 @@ class Learner
     :testing_examples, :testing_outputs,
     :n_features, :n_hidden, :weights
   attr_accessor :learning_rate, :max_iterations, :error_tolerance
-  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 10000, error_tolerance = 0.01)
+  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 5000, error_tolerance = 0.01)
     @n_features = n_features
     @n_hidden = n_hidden
     @learning_rate = learning_rate
@@ -79,26 +79,45 @@ class Learner
 #    puts "Pesos inicializados a #{weights.inspect}"
 #    sleep 5
     iteration = 0
-    while (error(@training_examples, @training_outputs) > 0.01 && iteration < @max_iterations) do
-       puts "Iteracion #{iteration}"
+    
+    e = Float::INFINITY
+    past_e = e
+    while (e > 0.01 && iteration < @max_iterations) do
+#       puts "Iteracion #{iteration}"
 #      puts "Pesos #{weights.inspect}"
 #       puts "Error #{error(training_examples, training_outputs)}"
 #      sleep 2
+      e = 0
+      # Orden 500
       @training_examples.each_with_index do |ei, i|
         lambdas = Array.new
         
+        # Orden
         o = evaluate(ei)
+        #puts o.inspect
+        # Orden 1
         for k in @output_neurons do
           lambdas[k] = o[k] * (1 - o[k] ) * (@training_outputs[i] - o[k] )        
         end 
 
+        # Orden n_hidden
         for h in @hidden_neurons do
 #          puts o.inspect
           lambdas[h] = o[h] * (1 - o[h]) * @output_neurons.inject(0) {|acc, k| acc + @weights[k][h] * lambdas[k]}
         end
         
+        # Update error
+        e += ((@training_outputs[i] - o.last)**2) / @training_outputs.size
+
+        
+        # Orden 30
         update_weights(lambdas, o)
       end
+      if (past_e - e).abs <= 0.0000001
+        return
+      end
+      past_e = e
+      #sleep 0.2
       iteration += 1
     end
   end
@@ -107,34 +126,36 @@ class Learner
   # returns an array such that o[k] is the output for neuron k
   # o tiene que tener las posiciones definidas para las neuronas de entrada tambien (TODAS)
   def evaluate(example)
-    o = example.dup
-    tmp = 0
+    outs = example.dup
+    
     
     @hidden_neurons.each do |h|
-      @input_neurons.each do |k|
+      tmp = 0
+      @input_neurons.each do |i|
         #puts example.inspect
         #puts @weights.inspect
-        tmp = tmp + @weights[h][k] * example[k]
+        tmp = tmp + @weights[h][i] * outs[i]
       end
-      o[h] = sig(tmp)
+      outs[h] = sig(tmp)
     end
 
-    tmp = 0
-
-    @output_neurons.each do |h|
-      @hidden_neurons.each do |k|
+    @output_neurons.each do |o|
+      tmp = 0
+      @hidden_neurons.each do |h|
         #puts "Intentando acceder al peso #{h} , #{k}"
         #sleep 5
-        tmp = tmp + @weights[h][k]*o[k]
+        tmp = tmp + @weights[o][h] * outs[h]
       end
-      o[h] = sig(tmp)
+      outs[o] = sig(tmp)
     end
-    o
+    #puts outs.inspect
+    #sleep 2
+    outs
   end
 
   def sig(x)
     e = 2.71828
-    1/(1 - e**x)
+    1.0/(1 + e**(-x))
   end
 
   # Calculate the error in examples with respect to the expected
@@ -173,16 +194,17 @@ class Learner
   end
 
   # Update weights with the differences in lambdas
-  def update_weights(lambdas, o)
+  def update_weights(lambdas, outs)
+    # Orden n_hidden * n_features <= 20
     @hidden_neurons.each do |h|
-      @input_neurons.each do |k|
-        @weights[h][k] = @weights[h][k] + learning_rate*lambdas[h]*o[k]
+      @input_neurons.each do |i|
+        @weights[h][i] = @weights[h][i] + learning_rate*lambdas[h]*outs[i]
       end
     end
-
-    @output_neurons.each do |h|
-      @hidden_neurons.each do |k|
-        @weights[h][k] = @weights[h][k] + learning_rate*lambdas[h]*o[k]
+    # Orden n_hidden <= 10
+    @output_neurons.each do |o|
+      @hidden_neurons.each do |h|
+        @weights[o][h] = @weights[o][h] + learning_rate*lambdas[o]*outs[h]
       end
     end 
   end  
@@ -193,12 +215,12 @@ class Learner
     w = Array.new( n_features + n_hidden + 1 , [] )
     @input_neurons.each do |i|
       @hidden_neurons.each do |h|
-        w[h][i] = rand
+        w[h][i] = (rand - rand) * 0.2
       end
     end
     @hidden_neurons.each do |h|
       @output_neurons.each do |o|
-        w[o][h] = rand
+        w[o][h] = (rand - rand) * 2
       end
     end
     w

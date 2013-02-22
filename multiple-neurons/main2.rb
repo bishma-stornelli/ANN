@@ -3,9 +3,10 @@ require './learner'
 begin
   # Look the best combination for each file
   bests = {}
-  (2..10).each do |n_hidden|
-    %w(input/datos_r6_n500.txt input/datos_r6_n1000.txt input/datos_r6_n2000.txt input/own_500 input/own_1000 input/own_2000).each do |file_path|
-      [0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95, 0.99].each do |learning_rate|
+  %w(input/datos_r6_n500.txt input/datos_r6_n1000.txt input/datos_r6_n2000.txt input/own_500 input/own_1000 input/own_2000).each do |file_path|
+    (2..10).each do |n_hidden|
+      [0.01, 0.05, 0.1, 0.2, 0.3].each do |learning_rate|
+        puts "Probando archivo #{file_path} con #{n_hidden} neuronas y tasa de aprendizaje #{learning_rate}"
         l = Learner.new(2, n_hidden, learning_rate)
         l.load_training_examples(file_path, {"1" => "1", "-1" => "0"}, " ")
         l.load_testing_examples('input/own_10000', {"1" => "1", "-1" => "0"}, " ")
@@ -20,7 +21,7 @@ begin
             :learner => nil
           } if bests[file_path].nil?
         
-        testing_error = l.error(l.testing_examples, l.testing_examples)
+        testing_error = l.error(l.testing_examples, l.testing_outputs)
         if testing_error < bests[file_path][:error][:testing]
           bests[file_path][:n_hidden] = n_hidden
           bests[file_path][:learning_rate] = learning_rate
@@ -28,6 +29,7 @@ begin
           bests[file_path][:error][:training] = l.error(l.training_examples, l.training_outputs)
           bests[file_path][:learner] = l
         end
+        puts "\tError en prueba: #{testing_error}\tError en entrenamiento: #{l.error(l.training_examples, l.training_outputs)}"
       end
     end
   end
