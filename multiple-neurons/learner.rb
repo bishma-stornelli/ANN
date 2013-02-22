@@ -113,7 +113,7 @@ class Learner
         # Orden 30
         update_weights(lambdas, o)
       end
-      if (past_e - e).abs <= 0.0000001
+      if (past_e - e).abs <= 0.000001
         return
       end
       past_e = e
