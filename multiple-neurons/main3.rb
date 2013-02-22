@@ -4,22 +4,12 @@ begin
   # Main to solve question 3 and plot the charts needed
   file_path = "input/bupa.data"
   bests = {}
-<<<<<<< HEAD
-  INFINITY = 1.0/0.0
-  file_path = "input/bupa.data"
-  (2..10).each do |n_hidden|
-    [0.5,0.6,0.7,0.8,0.9].each do |percentage|
-      [0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95, 0.99].each do |learning_rate|
-        l = Learner.new(6, n_hidden, learning_rate)
-        l.load_training_examples(file_path, {"1" => "1", "2" => "0"})
-=======
   [0.5,0.6,0.7,0.8,0.9].each do |percentage|
     (2..10).each do |n_hidden|
       [0.01, 0.05, 0.1, 0.2, 0.3, 0.5].each do |learning_rate|
         puts "Probando porcentaje #{percentage} con #{n_hidden} neuronas y tasa de aprendizaje #{learning_rate}"
         l = Learner.new(6, n_hidden, learning_rate, 1000)
         l.load_training_examples(file_path, {"1\n" => "1", "2\n" => "0"})
->>>>>>> e8fb97beb97c2ee4400a3a2e06969fafa6e7b12e
         l.split_examples(percentage)
         l.train
         

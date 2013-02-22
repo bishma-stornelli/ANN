@@ -31,7 +31,7 @@ class Learner
     :n_features, :n_hidden, :weights,
     :input_neurons, :hidden_neurons, :output_neurons
   attr_accessor :learning_rate, :max_iterations, :error_tolerance
-  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 5000, error_tolerance = 0.01)
+  def initialize(n_features, n_hidden, learning_rate = 0.1, max_iterations = 1000, error_tolerance = 0.01)
     @n_features = n_features + 1
     @n_hidden = n_hidden + 1
     @learning_rate = learning_rate
