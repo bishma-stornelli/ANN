@@ -3,7 +3,9 @@ require './learner'
 begin
   # Look the best combination for each file
   bests = {}
-  %w(input/datos_r6_n500.txt input/datos_r6_n1000.txt input/datos_r6_n2000.txt input/own_500 input/own_1000 input/own_2000).each do |file_path|
+  INFINITY = 1.0/0.0
+  #%w(input/datos_r6_n500.txt input/datos_r6_n1000.txt input/datos_r6_n2000.txt input/own_500 input/own_1000 input/own_2000).each do |file_path|
+  file_path = "input/datos_r6_n1000.txt"
     (2..10).each do |n_hidden|
       [0.01, 0.05, 0.1, 0.2, 0.3].each do |learning_rate|
         puts "Probando archivo #{file_path} con #{n_hidden} neuronas y tasa de aprendizaje #{learning_rate}"
@@ -32,7 +34,7 @@ begin
         puts "\tError en prueba: #{testing_error}\tError en entrenamiento: #{l.error(l.training_examples, l.training_outputs)}"
       end
     end
-  end
+  #end
   
   f_config = File.open("outputs/configuration", "w")
   f_config.write("File\t\tn_hidden\t\tlearning_rate\t\ttesting_error\t\ttraining_error\n")

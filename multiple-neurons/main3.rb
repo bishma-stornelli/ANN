@@ -3,6 +3,8 @@ require './learner'
 begin
   # Main to solve question 3 and plot the charts needed
   bests = {}
+  INFINITY = 1.0/0.0
+  file_path = "input/bupa.data"
   (2..10).each do |n_hidden|
     [0.5,0.6,0.7,0.8,0.9].each do |percentage|
       [0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 0.95, 0.99].each do |learning_rate|

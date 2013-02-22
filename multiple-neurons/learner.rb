@@ -161,7 +161,7 @@ class Learner
   # Calculate the error in examples with respect to the expected
   # outputs outputs
   def error(examples, outputs)
-    outputs.each_with_index.inject(0) { |acc, (output, index)| acc + (output - evaluate(examples[index]).last)**2 } / outputs.size
+    outputs.each_with_index.inject(0) { |acc, (output, index)| acc + (output - evaluate(examples[index]).last)**2 } / 2
   end  
   
   def load_training_examples(file_path, output_map = {}, sep = ",")
