@@ -1,0 +1,2 @@
+File		n_hidden		learning_rate		testing_error		training_error
+input/datos_r6_n500.txt		10		0.05		0.0264466074360235		0.020620656885384

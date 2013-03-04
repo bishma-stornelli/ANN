@@ -1,0 +1,2 @@
+File		n_hidden		learning_rate		testing_error		training_error
+input/own_2000		7		0.01		0.0245600360948115		0.019112207528453

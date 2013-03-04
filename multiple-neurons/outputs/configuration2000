@@ -1,0 +1,2 @@
+File		n_hidden		learning_rate		testing_error		training_error
+input/datos_r6_n2000.txt		9		0.1		0.0171698886429342		0.0173017009105758
