@@ -62,7 +62,7 @@ dev.off()
 jpeg('dataown2000.jpg')
 data2000azules <- read.table(file="own_2000_0", header= FALSE, sep=",")
 data2000rojos <- read.table(file="own_2000_1", header= FALSE, sep=",")
-plot(data2000azules[,1], data2000azules[,2], main="1000 Patrones", xlab="Eje X", ylab="Eje Y",col = "darkblue", col.main="blue", pch = 20, xlim= c(0, 20), ylim=c(0,20))
+plot(data2000azules[,1], data2000azules[,2], main="2000 Patrones", xlab="Eje X", ylab="Eje Y",col = "darkblue", col.main="blue", pch = 20, xlim= c(0, 20), ylim=c(0,20))
 points(data2000rojos[,1], data2000rojos[,2], col = "red", pch = 20)
 
 legend("topright", inset=.02, title="Tipos de puntos", c("En circulo","En cuadrado"),fill= c("blue", "red") , horiz=FALSE)
