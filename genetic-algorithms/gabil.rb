@@ -1,11 +1,12 @@
 class gabil
 
-	attr_reader :population, :inputs, :outputs, :fitness, :fatherSelection1, :fatherSelection2, :survivorSelection1, :survivorSelection2
+	attr_reader :population_size, :population, :inputs, :outputs, :fitness, :fatherSelection1, :fatherSelection2, :survivorSelection1, :survivorSelection2
 
-	attr_accessor :fitness_threshold, :n_features
+	attr_accessor :fitness_threshold, :n_features, :mutation_rate, :crossover_rate
 
-	def inicialize(fitness_threshold, n_features, population)
-		@population = population
+	def inicialize(fitness_threshold, n_features, population_size, mutation_rate = 0.001, crossover_rate = 0.6)
+		@population_size = population_size
+		@population = []
 		@inputs = []
 		@outputs = []
 		@fitness = []
@@ -15,6 +16,8 @@ class gabil
 		@survivorSelection2 = []
 		@fitness_threshold = fitness_threshold
 		@n_features = n_features
+		@mutation_rate = mutation_rate
+		@crossover_rate = crossover_rate
 	end
 
 	def inicializePopulation()
