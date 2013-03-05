@@ -21,25 +21,36 @@ class gabil
 
 	end
 
-	def fatherSelection1(x, r)
-
-		result = []
-
-		sum = x.inject(0){|res,item| res + item}
-
-		for k in inputs do
-			@fatherSelection1[k] = @fitness[k].to_f/sum
+  def selection(population)
+    send(@selection_method, population)
+  end
+  
+	def roulette_wheel_selection(population)
+		selected = []    
+    current_fitness = []
+    
+    for i in population do
+			current_fitness << fitness(i)
 		end
-
-		propability = (1.0 - r.to_f)/@population
-
-		propability.times do
-			i = rand x.size
-			result << x.delete_at(i)
-		end
-
-		return result
-
+		
+		sum = current_fitness.inject(0.0){|res, item| res + item}
+		probabilities = current_fitness.map{ |i| i / sum }
+    
+    ( (1 - @crossover_rate) * @population_size ).times do 
+      # pick a random number and select the  individual 
+      # corresponding to that roulette-wheel area
+      r , inc = rand * probabilities.max, 0 
+      population.each_index do |i| 
+        if r < (inc += probabilities[i])
+          selected << population[i]
+          # make selection not pick sample twice
+          population.delete_at i
+          probabilities.delete_at i
+          break
+        end
+      end
+    end
+		return selected
 	end
 
 	def fatherSelection2(x)
@@ -62,8 +73,15 @@ class gabil
 
 	end
 
+  # Recibe el individuo con el cual se va a evaluar los ejemplos de entrenamiento
+  # Fitness(x) = (correct(x))^2
 	def fitness(x)
 
+	end
+	
+	# Devuelve el porcentaje de ejemplos clasificados correctamente usando el conjunto
+	# de reglas x
+	def correct(x)
 	end
 
 	def recombine(x)
