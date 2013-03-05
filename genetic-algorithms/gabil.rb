@@ -1,11 +1,12 @@
 class gabil
 
-	attr_reader :population, :inputs, :outputs, :fitness, :fatherSelection1, :fatherSelection2, :survivorSelection1, :survivorSelection2
+	attr_reader :population_size, :population, :inputs, :outputs, :fitness, :fatherSelection1, :fatherSelection2, :survivorSelection1, :survivorSelection2
 
-	attr_accessor :fitness_threshold, :n_features
+	attr_accessor :fitness_threshold, :n_features, :mutation_rate, :crossover_rate
 
-	def inicialize(fitness_threshold, n_features, population)
-		@population = population
+	def inicialize(fitness_threshold, n_features, population_size, mutation_rate = 0.001, crossover_rate = 0.6)
+		@population_size = population_size
+		@population = []
 		@inputs = []
 		@outputs = []
 		@fitness = []
@@ -15,13 +16,15 @@ class gabil
 		@survivorSelection2 = []
 		@fitness_threshold = fitness_threshold
 		@n_features = n_features
+		@mutation_rate = mutation_rate
+		@crossover_rate = crossover_rate
 	end
 
 	def inicializePopulation()
 
 	end
 
-	def fatherSelection1(x, r)
+	def fatherSelection1(x)
 
 		result = []
 
@@ -31,7 +34,7 @@ class gabil
 			@fatherSelection1[k] = @fitness[k].to_f/sum
 		end
 
-		propability = (1.0 - r.to_f)/@population
+		propability = (1.0 - @crossover_rate.to_f)/@population_size
 
 		propability.times do
 			i = rand x.size
