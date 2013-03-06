@@ -8,7 +8,7 @@
 #   population[i][j] = j-esima regla del i-esimo individuo
 class Gabil
 
-  attr_reader :population_size, :population, :inputs, :outputs, :fitness, :fatherSelection1, :fatherSelection2, :survivorSelection1, :survivorSelection2
+  	attr_reader :population_size, :population, :inputs, :outputs, :fitness, :fatherSelection1, :fatherSelection2, :survivorSelection1, :survivorSelection2
 
 	attr_accessor :fitness_threshold, :n_features, :mutation_rate, :crossover_rate
 
