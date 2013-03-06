@@ -1,4 +1,4 @@
-require "./gabil"
+require './Gabil'
 begin
 
 	g1 = gabil.new(fitness_threshold, n_features, 690)
