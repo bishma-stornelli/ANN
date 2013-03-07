@@ -99,12 +99,29 @@ class Gabil
 
 	end
 
-	def addAlternative
+	def addAlternative(attribute)
+	
+		n = (@population_size * 0.01).round
 
+		n.times do
+			l = rand @population_size
+			x = @population[l][attribute]
+			p = x.length
+			x[rand p] = 1
+		end
 	end
 
-	def dropCondition
+	def dropCondition(attribute)
+		n = (@population_size*0.6).round
 
+		n.times do
+			l = rand @population_size
+			x = @population[l][attribute]
+			x.each_with_index do |e, j|
+				x[j] = 1
+			end
+			
+		end
 	end
 
 	def recombine(x)
