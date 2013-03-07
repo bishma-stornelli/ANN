@@ -1,5 +1,7 @@
 require './gabil'
 
+@size_of_attr = [2,3,3,4,3,14, 9, 3, 2, 2, 3, 2, 3, 3, 3, 1]
+
 def load_examples(file_path, separator = ",")
 	inputs = []
 	population = []
@@ -87,15 +89,15 @@ def load_examples(file_path, separator = ",")
 		end
 
 		aux << case i[6]
-			when "v"  then [1,0,0,0,0,0,0,0]
-			when "h"  then [0,1,0,0,0,0,0,0]
-			when "bb" then [0,0,1,0,0,0,0,0]
-			when "j"  then [0,0,0,1,0,0,0,0]
-			when "n"  then [0,0,0,0,1,0,0,0]
-			when "z"  then [0,0,0,0,0,1,0,0]
-			when "dd" then [0,0,0,0,0,0,1,0]
-			when "ff" then [0,0,0,0,0,0,0,1]
-			else [0,0,0,0,0,0,0,1]
+			when "v"  then [1,0,0,0,0,0,0,0,0]
+			when "h"  then [0,1,0,0,0,0,0,0,0]
+			when "bb" then [0,0,1,0,0,0,0,0,0]
+			when "j"  then [0,0,0,1,0,0,0,0,0]
+			when "n"  then [0,0,0,0,1,0,0,0,0]
+			when "z"  then [0,0,0,0,0,1,0,0,0]
+			when "dd" then [0,0,0,0,0,0,1,0,0]
+			when "ff" then [0,0,0,0,0,0,0,1,0]
+			else           [0,0,0,0,0,0,0,0,1]
 		end
 
 		h = (a8.max - a8.min) / 3
@@ -166,6 +168,44 @@ def load_examples(file_path, separator = ",")
 	end
 	
 	population
+end
+
+#############################################################################
+########## FUNCIONES PARA GENERAR LA POBLACION INICIAL ######################
+#############################################################################
+
+# Genera un arreglo de tamano size cuyos elementos son enteros aleatorios entre [0,1] 
+def generate_random_attribute_rule( size )
+  r = []
+  size.times { r << rand.round }
+  r
+end
+
+# Genera una regla con 16 atributos. Cada atributo tiene un tamano de acuerdo a 
+# size_of_attr definido al principio del archivo
+def generate_random_rule
+  rule = []
+  @size_of_attr.each do |size|
+    rule << generate_random_attribute_rule(size)
+  end
+  rule
+end
+
+# Genera un arreglo que contiene size reglas
+def generate_random_hypothesis( size )
+  hypothesis = []
+  size.times do
+    hypothesis << generate_random_rule
+  end
+  hypothesis
+end
+
+def generate_random_population( size )
+  population = []
+  size.times do
+    population << generate_random_hypothesis( 1 )
+  end
+  population
 end
 
 =begin

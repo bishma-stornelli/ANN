@@ -6,6 +6,7 @@
 # Para resumir:
 #   population[i] = i-esimo individuo (conjunto de reglas)
 #   population[i][j] = j-esima regla del i-esimo individuo
+#   population[i][j][k] = k-esimo atributo de la j-esima regla del i-esimo individuo
 class Gabil
 
   	attr_reader :population_size, :population, :inputs, :outputs, :fitness, :fatherSelection1, :fatherSelection2, :survivorSelection1, :survivorSelection2
@@ -130,18 +131,6 @@ class Gabil
 
 	def mutate(x)
 
-	end
-
-	def load_examples(inputs, outputs, file_path, output_map = {}, separator = ",")
-		File.open(file_path, "r") do |infile|
-			while (line = infile.gets)
-				tmp = line.split(separator)
-			    tmp[n_features - 1 ] = output_map[tmp[n_features - 1]].nil? ? tmp[n_features - 1] : output_map[tmp[n_features - 1]]
-			    #tmp.map!{|a| a.to_f}
-			    outputs << tmp[n_features - 1]
-			    inputs << (tmp[0,n_features - 1].concat([1.0]))
-			end
-		end
 	end
 	
 	private
