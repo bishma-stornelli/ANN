@@ -208,33 +208,37 @@ def generate_random_population( size )
   population
 end
 
+##################################################################################
+####### ENTRENAR HASTA QUE SE CLASIFIQUEN SUFICIENTES EJEMPLOS CORRECTAMENTE #####
+##################################################################################
+
 =begin
 begin
 
-	g1 = gabil.new(fitness_threshold, n_features, 690)
-	g2 = gabil.new(fitness_threshold, n_features, 690)
-	r = 0.0
-
-	P1 = g1.inicializePopulation()
-	g1.fitness = g1.fitness(P1)
-	while g1.fitness_threshold > max(g1.fitness)
-		Pf = g1.fatherSelection1(P1, r)
-		recombine(Pf)
-		mutate(Pf)
-		g1.fitness = g1.fitness(Pf)
-		P1 = survivorSelection1(Pf)
-	end
-
-	P2 = g1.inicializePopulation()
-	g2.fitness = g2.fitness(P2)
-	while g2.fitness_threshold > max(g2.fitness)
-		Pf = g2.fatherSelection2(P2)
-		recombine(Pf)
-		mutate(Pf)
-		g2.fitness = g2.fitness(Pf)
-		P2 = survivorSelection1(Pf)
-	end
-
+  [:roulette_wheel_selection, :elitist_selection].each do |selection_method|
+    # Seleccionar mejor configuracion del metodo de seleccion
+  end
+  
+  [0.001, 0.005, 0.01, 0.05, 0.1, 0.2].each do |mutation_rate|
+    [0.4, 0.6, 0.8, 1.0].each do |crossover_rate|
+      next if mutation_rate == 0.001 && crossover_rate == 0.6 # Configuracion por defecto, ya se eligio de arriba
+      # Seleccionar mejor par (mutation_rate, crossover_rate) usando el mejor metodo de seleccion
+    end
+  end
+  
+  [false, true].each do |drop_condition|
+    [false, true].each do |add_alternative|
+      next unless drop_condition || add_alternative # both false is default configuration
+      # Ver si drop_condition o add_alternative logran mejorar el resultado
+    end
+  end
+  
+  population = generate_random_population( population_size )
+  gabil = Gabil.new(population)
+  
+  while gabil.best_fitness < fitness_threshold
+    gabil.evolve
+  end
 
 end
 =end
