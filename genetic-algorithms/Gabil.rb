@@ -8,24 +8,27 @@
 #   population[i][j] = j-esima regla del i-esimo individuo
 class Gabil
 
-	attr_reader :population_size, :population, :inputs, :outputs, :fitness, :fatherSelection1, :fatherSelection2, :survivorSelection1, :survivorSelection2, :training_population
+	attr_reader :population_size, :population, :inputs, :outputs, :fitness, :fatherSelection1, :fatherSelection2, :survivorSelection1, :survivorSelection2, :training_examples
 
 	attr_accessor :fitness_threshold, :n_features, :mutation_rate, :crossover_rate
 
-	def initialize(population, options = {} )
-	  options = {
-	    :population_size => 100,
-	    :fitness_threshold => 0.01,
-	    :mutation_rate => 0.001,
-	    :crossover_rate => 0.6,
-	    :selection_method => :roulette_wheel_selection
-	  }.merge(options)
-	  @population = population.dup
+	def initialize(population, option = {})
+		options = {
+			:population_size => 100,
+			:fitness_threshold => 0.01,
+			:mutation_rate => 0.001,
+			:crossover_rate => 0.6,
+			:selection_method => :roulette_wheel_selection
+		}.merge(options)
+
+	  	@population = population.dup
 		@population_size = options[:population_size]
 		@fitness_threshold = options[:fitness_threshold]
 		@mutation_rate = options[:mutation_rate]
 		@crossover_rate = options[:crossover_rate]
 		@current_fitness = calculate_fitness
+		@n_features = 15
+		@outputs = []
 	end
 
 	def evolve
@@ -85,7 +88,7 @@ class Gabil
 		end
     
 		while(selected.size < new_size )
-			selected << @population.delete_at( rand( @population.size) )
+			selected << @population.delete_at( rand( @population_size) )
 		end
     
 		selected
@@ -128,23 +131,36 @@ class Gabil
 
 	end
 
-	def addAlternative
+	def addAlternative(atribute)
+		n = (@population_size*0.01).round
+
+		n.times do
+			l = rand @population_size
+			x = @population[l][atribute]
+			p = x.length
+			x[rand p] = 1
+		end
+	end
+
+	def dropCondition(atribute)
+		n = (@population_size*0.6).round
+
+		n.times do
+			l = rand @population_size
+			x = @population[l][atribute]
+			x.each_with_index do |e, j|
+				x[j] = 1
+			end
+			
+		end
 
 	end
 
-	def dropCondition
+	def crossover
 
 	end
 
-	def fitness(x)
-
-	end
-
-	def recombine(x)
-
-	end
-
-	def mutate(x)
+	def mutate
 
 	end
 
@@ -306,11 +322,9 @@ class Gabil
 				aux << [0,0,1]
 			end
 
-			result << aux
+			@population << aux
 
 		end
-
-		print result[0]
 
 	end
 
