@@ -1,10 +1,13 @@
 require './gabil'
+require './population'
+require './hypothesis'
+require './rule'
 
 @size_of_attr = [2,3,3,4,3,14, 9, 3, 2, 2, 3, 2, 3, 3, 3, 1]
 
 def load_examples(file_path, separator = ",")
 	inputs = []
-	population = []
+	population = Population.new
 	aux = []
 	a2 = [2]
 	a3 = [3]
@@ -31,7 +34,7 @@ def load_examples(file_path, separator = ",")
 
 	inputs.each_with_index do |i, n|
 
-		aux = []
+		aux = Hypothesis.new
 
 		aux << case i[0]
 			when "a" then [1, 0]
@@ -184,7 +187,7 @@ end
 # Genera una regla con 16 atributos. Cada atributo tiene un tamano de acuerdo a 
 # size_of_attr definido al principio del archivo
 def generate_random_rule
-  rule = []
+  rule = Rule.new
   @size_of_attr.each do |size|
     rule << generate_random_attribute_rule(size)
   end
@@ -193,7 +196,7 @@ end
 
 # Genera un arreglo que contiene size reglas
 def generate_random_hypothesis( size )
-  hypothesis = []
+  hypothesis = Hypothesis.new
   size.times do
     hypothesis << generate_random_rule
   end
@@ -201,7 +204,7 @@ def generate_random_hypothesis( size )
 end
 
 def generate_random_population( size )
-  population = []
+  population = Population.new
   size.times do
     population << generate_random_hypothesis( 1 )
   end
