@@ -12,8 +12,8 @@ class Gabil
 
 	attr_accessor :fitness_threshold, :n_features, :mutation_rate, :crossover_rate
 
-	def initialize(population, option = {})
-		options = {
+	def initialize(population, options = {})
+	  	options = {
 			:population_size => 100,
 			:fitness_threshold => 0.01,
 			:mutation_rate => 0.001,
@@ -131,23 +131,25 @@ class Gabil
 
 	end
 
-	def addAlternative(atribute)
-		n = (@population_size*0.01).round
+	def addAlternative
+		n = (@population_size*0.001).round
 
 		n.times do
+			atr = rand @n_features
 			l = rand @population_size
-			x = @population[l][atribute]
+			x = @population[l][atr]
 			p = x.length
 			x[rand p] = 1
 		end
 	end
 
-	def dropCondition(atribute)
-		n = (@population_size*0.6).round
+	def dropCondition()
+		n = (@population_size*0.006).round
 
 		n.times do
+			atr = rand @n_features
 			l = rand @population_size
-			x = @population[l][atribute]
+			x = @population[l][atr]
 			x.each_with_index do |e, j|
 				x[j] = 1
 			end
@@ -164,17 +166,21 @@ class Gabil
 
 	end
 
+	def sturges
+		return (1 + log2(@population_size)).round
+	end
+
 	def load_examples(inputs, outputs, file_path, separator = ",")
 
 		inputs = []
 		result = []
 		aux = []
-		a2 = [2]
-		a3 = [3]
-		a8 = [8]
-		a11 = [11]
-		a14 = [14]
-		a15 = [15]
+		a2 = []
+		a3 = []
+		a8 = []
+		a11 = []
+		a14 = []
+		a15 = []
 
 		File.open(file_path, "r") do |infile|
 			while (line = infile.gets)
@@ -193,133 +199,261 @@ class Gabil
 		inputs.each_with_index do |i, n|
 
 			aux = []
+			tmp = []
 
-			aux << case i[0]
-				when "a" then [1,0]
-				else [0,1]
-			end
+			if i[0] == "?"
 
-			h = (a2.max - a2.min)/3
-
-			if i[1].to_f >= a2.min && i[1].to_f < h
-				aux << [1,0,0]
-			elsif i[1].to_f >= h && i[1].to_f < h*2
-				aux << [0,1,0]
 			else
-				aux << [0,0,1]
+
+				aux << case i[0]
+					when "a" then [1,0]
+					else [0,1]
+				end
 			end
 
-			h = (a3.max - a3.min)/3
+			h = (a2.max - a2.min)/sturges
 
-			if i[2].to_f >= a3.min && i[2].to_f < h
-				aux << [1,0,0]
-			elsif i[2].to_f >= h && i[2].to_f < h*2
-				aux << [0,1,0]
+			p = a2.min
+
+			j = 0
+
+			if i[1] == "?"
+
 			else
-				aux << [0,0,1]
+
+				sturges.times do
+
+					if i[1].to_f >= p + h*j && i[1].to_f < p + h*(j+1)
+						tmp << Array.new(sturges - 1, 0)
+						tmp.insert(j, 1)
+						aux << tmp
+						break
+					end
+					j += 1
+				end
 			end
 
-			aux << case i[3]
-				when "u" then [1,0,0,0]
-				when "y" then [0,1,0,0]
-				when "l" then [0,0,1,0]
-				else [0,0,0,1]
-			end
+			h = (a3.max - a3.min)/sturges
 
-			aux << case i[4]
-				when "g" then [1,0,0]
-				when "p" then [0,1,0]
-				else [0,0,1]
-			end
+			p = a3.min
 
-			aux << case i[5]
-				when "c" then [1,0,0,0,0,0,0,0,0,0,0,0,0,0]
-				when "d" then [0,1,0,0,0,0,0,0,0,0,0,0,0,0]
-				when "cc" then [0,0,1,0,0,0,0,0,0,0,0,0,0,0]
-				when "i" then [0,0,0,1,0,0,0,0,0,0,0,0,0,0]
-				when "j" then [0,0,0,0,1,0,0,0,0,0,0,0,0,0]
-				when "k" then [0,0,0,0,0,1,0,0,0,0,0,0,0,0]
-				when "m" then [0,0,0,0,0,0,1,0,0,0,0,0,0,0]
-				when "r" then [0,0,0,0,0,0,0,1,0,0,0,0,0,0]
-				when "q" then [0,0,0,0,0,0,0,0,1,0,0,0,0,0]
-				when "w" then [0,0,0,0,0,0,0,0,0,1,0,0,0,0]
-				when "x" then [0,0,0,0,0,0,0,0,0,0,1,0,0,0]
-				when "e" then [0,0,0,0,0,0,0,0,0,0,0,1,0,0]
-				when "aa" then [0,0,0,0,0,0,0,0,0,0,0,0,1,0]
-				else [0,0,0,0,0,0,0,0,0,0,0,0,0,1]
-			end
+			j = 0
 
-			aux << case i[6]
-				when "v"  then [1,0,0,0,0,0,0,0]
-				when "h"  then [0,1,0,0,0,0,0,0]
-				when "bb" then [0,0,1,0,0,0,0,0]
-				when "j"  then [0,0,0,1,0,0,0,0]
-				when "n"  then [0,0,0,0,1,0,0,0]
-				when "z"  then [0,0,0,0,0,1,0,0]
-				when "dd" then [0,0,0,0,0,0,1,0]
-				when "ff" then [0,0,0,0,0,0,0,1]
-				else [0,0,0,0,0,0,0,1]
-			end
+			tmp = []
 
-			h = (a8.max - a8.min)/3
+			if i[2] == "?"
 
-			if i[7].to_f >= a8.min && i[7].to_f < h
-				aux << [1,0,0]
-			elsif i[7].to_f >= h && i[7].to_f < h*2
-				aux << [0,1,0]
 			else
-				aux << [0,0,1]
+
+				sturges.times do
+
+					if i[2].to_f >= p + h*j && i[2].to_f < p + h*(j+1)
+						tmp << Array.new(sturges - 1, 0)
+						tmp.insert(j, 1)
+						aux << tmp
+						break
+					end
+					j += 1
+				end
 			end
 
-			aux << case i[8]
-				when "t" then [1,0]
-				else [0,1]
-			end
+			if i[3] == "?"
 
-			aux << case i[9]
-				when "f" then [1,0]
-				else [0,1]
-			end
-
-			h = (a11.max - a11.min)/3
-
-			if i[10].to_f >= a11.min && i[10].to_f < h
-				aux << [1,0,0]
-			elsif i[10].to_f >= h && i[10].to_f < h*2
-				aux << [0,1,0]
 			else
-				aux << [0,0,1]
+
+				aux << case i[3]
+					when "u" then [1,0,0,0]
+					when "y" then [0,1,0,0]
+					when "l" then [0,0,1,0]
+					else [0,0,0,1]
+				end
 			end
 
-			aux << case i[11]
-				when "t" then [1,0]
-				else [0,1]
-			end
+			if i[4] == "?"
 
-			aux << case i[12]
-				when "g" then [1,0,0]
-				when "p" then [0,1,0]
-				else [0,0,1]
-			end
-
-			h = (a14.max - a14.min)/3
-
-			if i[13].to_f >= a14.min && i[13].to_f < h
-				aux << [1,0,0]
-			elsif i[13].to_f >= h && i[13].to_f < h*2
-				aux << [0,1,0]
 			else
-				aux << [0,0,1]
+
+				aux << case i[4]
+					when "g" then [1,0,0]
+					when "p" then [0,1,0]
+					else [0,0,1]
+				end
 			end
 
-			h = (a15.max - a15.min)/3
+			if i[5] == "?"
 
-			if i[14].to_f >= a15.min && i[14].to_f < h
-				aux << [1,0,0]
-			elsif i[14].to_f >= h && i[14].to_f < h*2
-				aux << [0,1,0]
 			else
-				aux << [0,0,1]
+
+				aux << case i[5]
+					when "c" then [1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+					when "d" then [0,1,0,0,0,0,0,0,0,0,0,0,0,0]
+					when "cc" then [0,0,1,0,0,0,0,0,0,0,0,0,0,0]
+					when "i" then [0,0,0,1,0,0,0,0,0,0,0,0,0,0]
+					when "j" then [0,0,0,0,1,0,0,0,0,0,0,0,0,0]
+					when "k" then [0,0,0,0,0,1,0,0,0,0,0,0,0,0]
+					when "m" then [0,0,0,0,0,0,1,0,0,0,0,0,0,0]
+					when "r" then [0,0,0,0,0,0,0,1,0,0,0,0,0,0]
+					when "q" then [0,0,0,0,0,0,0,0,1,0,0,0,0,0]
+					when "w" then [0,0,0,0,0,0,0,0,0,1,0,0,0,0]
+					when "x" then [0,0,0,0,0,0,0,0,0,0,1,0,0,0]
+					when "e" then [0,0,0,0,0,0,0,0,0,0,0,1,0,0]
+					when "aa" then [0,0,0,0,0,0,0,0,0,0,0,0,1,0]
+					else [0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+				end
+			end
+
+			if i[6] == "?"
+
+			else
+
+				aux << case i[6]
+					when "v"  then [1,0,0,0,0,0,0,0]
+					when "h"  then [0,1,0,0,0,0,0,0]
+					when "bb" then [0,0,1,0,0,0,0,0]
+					when "j"  then [0,0,0,1,0,0,0,0]
+					when "n"  then [0,0,0,0,1,0,0,0]
+					when "z"  then [0,0,0,0,0,1,0,0]
+					when "dd" then [0,0,0,0,0,0,1,0]
+					when "ff" then [0,0,0,0,0,0,0,1]
+					else [0,0,0,0,0,0,0,1]
+				end
+			end
+
+			h = (a8.max - a8.min)/sturges
+
+			p = a8.min
+
+			j = 0
+
+			tmp = []
+
+			if i[7] == "?"
+
+			else
+
+				sturges.times do
+
+					if i[7].to_f >= p + h*j && i[7].to_f < p + h*(j+1)
+						tmp << Array.new(sturges - 1, 0)
+						tmp.insert(j, 1)
+						aux << tmp
+						break
+					end
+					j += 1
+				end
+			end
+
+			if i[8] == "?"
+
+			else
+
+				aux << case i[8]
+					when "t" then [1,0]
+					else [0,1]
+				end
+			end
+
+			if i[9] == "?"
+
+			else
+
+				aux << case i[9]
+					when "f" then [1,0]
+					else [0,1]
+				end
+			end
+
+			h = (a11.max - a11.min)/sturges
+
+			p = a11.min
+
+			j = 0
+
+			tmp = []
+
+			if i[10] == "?"
+
+			else
+
+				sturges.times do
+
+					if i[10].to_f >= p + h*j && i[10].to_f < p + h*(j+1)
+						tmp << Array.new(sturges - 1, 0)
+						tmp.insert(j, 1)
+						aux << tmp
+						break
+					end
+					j += 1
+				end
+			end
+
+			if i[11] == "?"
+
+			else
+
+				aux << case i[11]
+					when "t" then [1,0]
+					else [0,1]
+				end
+			end
+
+			if i[12] == "?"
+
+			else
+
+				aux << case i[12]
+					when "g" then [1,0,0]
+					when "p" then [0,1,0]
+					else [0,0,1]
+				end
+			end
+
+			h = (a14.max - a14.min)/sturges
+
+			p = a14.min
+
+			j = 0
+
+			tmp = []
+
+			if i[13] == "?"
+
+			else
+
+				sturges.times do
+
+					if i[13].to_f >= p + h*j && i[13].to_f < p + h*(j+1)
+						tmp << Array.new(sturges - 1, 0)
+						tmp.insert(j, 1)
+						aux << tmp
+						break
+					end
+					j += 1
+				end
+			end
+
+			h = (a15.max - a15.min)/sturges
+
+			p = a15.min
+
+			j = 0
+
+			tmp = []
+
+			if i[14] == "?"
+
+			else
+
+				sturges.times do
+
+					if i[14].to_f >= p + h*j && i[14].to_f < p + h*(j+1)
+						tmp << Array.new(sturges - 1, 0)
+						tmp.insert(j, 1)
+						aux << tmp
+						break
+					end
+					j += 1
+				end
 			end
 
 			@population << aux
