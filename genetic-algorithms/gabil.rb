@@ -207,6 +207,10 @@ class Gabil
 	  return true
 	end
 
+	def sturges
+		return (1 + log2(@population_size)).round
+	end
+
 	def load_examples(inputs, outputs, file_path, separator = ",")
 
 		inputs = []
