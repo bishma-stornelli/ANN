@@ -40,12 +40,12 @@ class Gabil
 	def evolve
   	Benchmark.bm do |x|
   	  @new_population = Population.new
-      x.report("selection"){ selection }
+      	x.report("selection"){ selection }
 	    x.report("crossover"){ crossover }
 	    x.report("mutate"){ mutate }
+	    x.report("calculate fitness"){ @current_fitness = calculate_fitness @new_population }
+	    x.report("select survivors"){ } # DEBERIA ELIMINAR EL FITNESS DE LOS ELEMENTOS QUE NO SOBREVIVEN
 	    x.report("update"){ @population = @new_population }
-	    x.report("calculate fitness"){ @current_fitness = calculate_fitness }
-	    x.report("select survivors"){ }
 	  end
 	end
 	
@@ -153,10 +153,10 @@ class Gabil
 	
 	#private
 	
-	def calculate_fitness
+	def calculate_fitness( p = @population )
 	  puts "Starting to calculate fitness of population" if $DEBUG
-	  @current_fitness ||= Array.new @population_size
-    @population.each_with_index do |hypothesis, index|
+	  @current_fitness ||= Array.new p.size
+    p.each_with_index do |hypothesis, index|
       # Hypothesis is of the form: [rule, rule, rule, ...]
       f = fitness(hypothesis)
       puts "\tFitness of hypothesis is #{f} and of the best hypothesis is #{@best_fitness}" if $DEBUG
