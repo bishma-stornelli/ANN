@@ -10,8 +10,8 @@ require 'benchmark'
 #   population[i][j] = j-esima regla del i-esimo individuo
 #   population[i][j][k] = k-esimo atributo de la j-esima regla del i-esimo individuo
 class Gabil
-	attr_reader :population_size, :population
-  	attr_reader :best_hypothesis, :best_fitness
+	attr_accessor :population_size, :population, :new_population
+  attr_reader :best_hypothesis, :best_fitness
 	attr_accessor :selection_method, :mutation_rate, :crossover_rate
 
 	def initialize(population, training_examples, options = {} )
@@ -39,12 +39,13 @@ class Gabil
 	
 	def evolve
   	Benchmark.bm do |x|
-  	  new_population = []
-      x.report("selection"){ new_population.concat selection }
+  	  @new_population = Population.new
+      	x.report("selection"){ selection }
 	    x.report("crossover"){ crossover }
 	    x.report("mutate"){ mutate }
-	    x.report("update"){ update }
-	    x.report("calculate fitness"){ calculate_fitness }
+	    x.report("calculate fitness"){ @current_fitness = calculate_fitness @new_population }
+	    x.report("select survivors"){ } # DEBERIA ELIMINAR EL FITNESS DE LOS ELEMENTOS QUE NO SOBREVIVEN
+	    x.report("update"){ @population = @new_population }
 	  end
 	end
 	
@@ -58,8 +59,7 @@ class Gabil
   # que aporta a la suma de fitness de toda la poblacion. Los individuos seleccionados
   # son eliminados de @population
 	def roulette_wheel_selection( new_size )
-		selected = []
-		
+	
 		sum = @current_fitness.inject(0.0){ |res, item| res + item }
 		if sum == 0 
 		  # there is no hypothesis in population which classify at least one example
@@ -77,63 +77,57 @@ class Gabil
       r , inc = rand * probabilities.max, 0 
       @population.each_index do |i| 
         if r < (inc += probabilities[i])
-          selected << @population.delete_at(i)
+          @new_population << @population.delete_at(i)
           probabilities.delete_at(i)
           break
         end
       end
     end
-    puts "Hypothesis selected = #{selected.inspect}" if $DEBUG
-    selected
+    puts "Hypothesis selected = #{@new_population.inspect}" if $DEBUG
+    @new_population
 	end
 
   # Selecciona new_size individuos de los cuales los new_size / 2 primeros son
   # aquellos con mejor fitness y los restantes son seleccionados aleatoriamente.
   # Elimina los elementos seleccionados de @population
 	def elitist_selection( new_size )
-    selected = []
     
     sorted_population = @population.sort do |a, b| 
       @current_fitness[@population.index(a)] <=> @current_fitness[@population.index(b)]
     end
     
     (new_size / 2).times do
-      selected << @population.delete_at( 0 )
+      @new_population << @population.delete_at( 0 )
     end
     
-    while(selected.size < new_size )
-      selected << @population.delete_at( rand( @population.size) )
+    while(@new_population.size < new_size )
+      @new_population << @population.delete_at( rand( @population.size) )
     end
     
-    selected
+    @new_population
 	end
 
   def crossover
   
   end
 
-	def addAlternative(attribute)
-	
-		n = (@population_size * 0.01).round
+	def add_alternative(attribute)
+		mutated_population = @new_population.sample( (0.01 * @new_population.size).round )
 
-		n.times do
-			l = rand @population_size
-			x = @population[l][attribute]
-			p = x.length
-			x[rand p] = 1
+		mutated_population.each do |hypothesis|
+			random_attr = random_attr(hypothesis)
+			random_attr[rand random_attr.length] = 1
 		end
 	end
 
-	def dropCondition(attribute)
-		n = (@population_size*0.6).round
+	def drop_condition(attribute)
+		mutated_population = @new_population.sample( (0.6 * @new_population.size).round )
 
-		n.times do
-			l = rand @population_size
-			x = @population[l][attribute]
-			x.each_with_index do |e, j|
-				x[j] = 1
-			end
-			
+		mutated_population.each do |hypothesis|
+		
+			random_attr = random_attr(hypothesis)
+			random_attr.map!{ 1 }
+						
 		end
 	end
 
@@ -141,312 +135,32 @@ class Gabil
 
 	end
 
-	def mutate(x)
+	def mutate
+	  puts "Selecting #{(@mutation_rate * @new_population.size).round} to mutate" if $DEBUG1
+	
+    mutated_population = @new_population.sample( (@mutation_rate * @new_population.size).round )
 
+    mutated_population.each_with_index do |hypothesis, i|
+      random_attr = random_attr(hypothesis)
+      bit_index = rand(random_attr.size)
+      # Muto un bit: si era 1 lo pongo en 0 y si era 0 lo pongo en 1
+      random_attr[bit_index] = (random_attr[bit_index] - 1).abs
+    end
+    drop_condition if @drop_condition
+    add_alternative if @add_alternative
+    
 	end
 
 	def sturges
 		return (1 + 3.322*Math.log10(@population_size)).round
 	end
 
-	def load_examples(inputs, file_path, separator = ",")
-
-		inputs = []
-		result = []
-		aux = []
-		a2 = []
-		a3 = []
-		a8 = []
-		a11 = []
-		a14 = []
-		a15 = []
-
-		File.open(file_path, "r") do |infile|
-			while (line = infile.gets)
-				tmp = line.split(separator)
-				inputs << tmp
-				a2 << tmp[1].to_f
-				a3 << tmp[2].to_f
-				a8 << tmp[7].to_f
-				a11 << tmp[10].to_f
-				a14 << tmp[13].to_f
-				a15 << tmp[14].to_f
-			    @outputs << tmp[@n_features - 1]
-			end
-		end
-
-		inputs.each_with_index do |i, n|
-
-			aux = []
-			tmp = []
-
-			if i[0] == "?"
-
-			else
-
-				aux << case i[0]
-					when "a" then [1,0]
-					else [0,1]
-				end
-			end
-
-			h = (a2.max - a2.min)/sturges
-
-			p = a2.min
-
-			j = 0
-
-			if i[1] == "?"
-
-			else
-
-				sturges.times do
-
-					if i[1].to_f >= p + h*j && i[1].to_f < p + h*(j+1)
-						tmp = Array.new(sturges - 1, 0)
-						tmp.insert(j, 1)
-						aux << tmp
-						break
-					end
-					j += 1
-				end
-			end
-
-			h = (a3.max - a3.min)/sturges
-
-			p = a3.min
-
-			j = 0
-
-			tmp = []
-
-			if i[2] == "?"
-
-			else
-
-				sturges.times do
-
-					if i[2].to_f >= p + h*j && i[2].to_f < p + h*(j+1)
-						tmp = Array.new(sturges - 1, 0)
-						tmp.insert(j, 1)
-						aux << tmp
-						break
-					end
-					j += 1
-				end
-			end
-
-			if i[3] == "?"
-
-			else
-
-				aux << case i[3]
-					when "u" then [1,0,0,0]
-					when "y" then [0,1,0,0]
-					when "l" then [0,0,1,0]
-					else [0,0,0,1]
-				end
-			end
-
-			if i[4] == "?"
-
-			else
-
-				aux << case i[4]
-					when "g" then [1,0,0]
-					when "p" then [0,1,0]
-					else [0,0,1]
-				end
-			end
-
-			if i[5] == "?"
-
-			else
-
-				aux << case i[5]
-					when "c" then [1,0,0,0,0,0,0,0,0,0,0,0,0,0]
-					when "d" then [0,1,0,0,0,0,0,0,0,0,0,0,0,0]
-					when "cc" then [0,0,1,0,0,0,0,0,0,0,0,0,0,0]
-					when "i" then [0,0,0,1,0,0,0,0,0,0,0,0,0,0]
-					when "j" then [0,0,0,0,1,0,0,0,0,0,0,0,0,0]
-					when "k" then [0,0,0,0,0,1,0,0,0,0,0,0,0,0]
-					when "m" then [0,0,0,0,0,0,1,0,0,0,0,0,0,0]
-					when "r" then [0,0,0,0,0,0,0,1,0,0,0,0,0,0]
-					when "q" then [0,0,0,0,0,0,0,0,1,0,0,0,0,0]
-					when "w" then [0,0,0,0,0,0,0,0,0,1,0,0,0,0]
-					when "x" then [0,0,0,0,0,0,0,0,0,0,1,0,0,0]
-					when "e" then [0,0,0,0,0,0,0,0,0,0,0,1,0,0]
-					when "aa" then [0,0,0,0,0,0,0,0,0,0,0,0,1,0]
-					else [0,0,0,0,0,0,0,0,0,0,0,0,0,1]
-				end
-			end
-
-			if i[6] == "?"
-
-			else
-
-				aux << case i[6]
-					when "v"  then [1,0,0,0,0,0,0,0]
-					when "h"  then [0,1,0,0,0,0,0,0]
-					when "bb" then [0,0,1,0,0,0,0,0]
-					when "j"  then [0,0,0,1,0,0,0,0]
-					when "n"  then [0,0,0,0,1,0,0,0]
-					when "z"  then [0,0,0,0,0,1,0,0]
-					when "dd" then [0,0,0,0,0,0,1,0]
-					when "ff" then [0,0,0,0,0,0,0,1]
-					else [0,0,0,0,0,0,0,1]
-				end
-			end
-
-			h = (a8.max - a8.min)/sturges
-
-			p = a8.min
-
-			j = 0
-
-			tmp = []
-
-			if i[7] == "?"
-
-			else
-
-				sturges.times do
-
-					if i[7].to_f >= p + h*j && i[7].to_f < p + h*(j+1)
-						tmp = Array.new(sturges - 1, 0)
-						tmp.insert(j, 1)
-						aux << tmp
-						break
-					end
-					j += 1
-				end
-			end
-
-			if i[8] == "?"
-
-			else
-
-				aux << case i[8]
-					when "t" then [1,0]
-					else [0,1]
-				end
-			end
-
-			if i[9] == "?"
-
-			else
-
-				aux << case i[9]
-					when "f" then [1,0]
-					else [0,1]
-				end
-			end
-
-			h = (a11.max - a11.min)/sturges
-
-			p = a11.min
-
-			j = 0
-
-			tmp = []
-
-			if i[10] == "?"
-
-			else
-
-				sturges.times do
-
-					if i[10].to_f >= p + h*j && i[10].to_f < p + h*(j+1)
-						tmp = Array.new(sturges - 1, 0)
-						tmp.insert(j, 1)
-						aux << tmp
-						break
-					end
-					j += 1
-				end
-			end
-
-			if i[11] == "?"
-
-			else
-
-				aux << case i[11]
-					when "t" then [1,0]
-					else [0,1]
-				end
-			end
-
-			if i[12] == "?"
-
-			else
-
-				aux << case i[12]
-					when "g" then [1,0,0]
-					when "p" then [0,1,0]
-					else [0,0,1]
-				end
-			end
-
-			h = (a14.max - a14.min)/sturges
-
-			p = a14.min
-
-			j = 0
-
-			tmp = []
-
-			if i[13] == "?"
-
-			else
-
-				sturges.times do
-
-					if i[13].to_f >= p + h*j && i[13].to_f < p + h*(j+1)
-						tmp = Array.new(sturges - 1, 0)
-						tmp.insert(j, 1)
-						aux << tmp
-						break
-					end
-					j += 1
-				end
-			end
-
-			h = (a15.max - a15.min)/sturges
-
-			p = a15.min
-
-			j = 0
-
-			tmp = []
-
-			if i[14] == "?"
-
-			else
-
-				sturges.times do
-
-					if i[14].to_f >= p + h*j && i[14].to_f < p + h*(j+1)
-						tmp = Array.new(sturges - 1, 0)
-						tmp.insert(j, 1)
-						aux << tmp
-						break
-					end
-					j += 1
-				end
-			end
-
-			@population << aux
-
-		end
-
-	end
+	#private
 	
-	private
-	
-	def calculate_fitness
+	def calculate_fitness( p = @population )
 	  puts "Starting to calculate fitness of population" if $DEBUG
-	  @current_fitness ||= Array.new @population_size
-    @population.each_with_index do |hypothesis, index|
+	  @current_fitness ||= Array.new p.size
+    p.each_with_index do |hypothesis, index|
       # Hypothesis is of the form: [rule, rule, rule, ...]
       f = fitness(hypothesis)
       puts "\tFitness of hypothesis is #{f} and of the best hypothesis is #{@best_fitness}" if $DEBUG
@@ -460,7 +174,7 @@ class Gabil
   # fitness(h) = (correct(h))^2
 	def fitness(hypothesis)
 	  puts "\tStarting to calculate fitness of hypothesis with #{hypothesis.size} rules" if $DEBUG
-    (correct(hypothesis)) ** 2 - (@penalized_fitness ? hypothesis.size : 0)
+    [(correct(hypothesis)) ** 2 - (@penalized_fitness ? hypothesis.size : 0) , 1.0].max
 	end
 	
 	# Devuelve el porcentaje de ejemplos clasificados correctamente usando el conjunto
@@ -502,6 +216,10 @@ class Gabil
 	  end
 	  return true
 	end
-
 	
+	def random_attr(hypothesis)
+	  rule_index = rand(hypothesis.size)
+    attr_index = rand(hypothesis[rule_index].size)
+    hypothesis[rule_index][attr_index]
+	end
 end
