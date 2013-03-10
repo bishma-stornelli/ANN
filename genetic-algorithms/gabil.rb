@@ -11,7 +11,7 @@ require 'benchmark'
 #   population[i][j][k] = k-esimo atributo de la j-esima regla del i-esimo individuo
 class Gabil
 	attr_reader :population_size, :population
-  attr_reader :best_hypothesis, :best_fitness
+  	attr_reader :best_hypothesis, :best_fitness
 	attr_accessor :selection_method, :mutation_rate, :crossover_rate
 
 	def initialize(population, training_examples, options = {} )
@@ -144,74 +144,12 @@ class Gabil
 	def mutate(x)
 
 	end
-	
-	private
-	
-	def calculate_fitness
-	  puts "Starting to calculate fitness of population" if $DEBUG
-	  @current_fitness ||= Array.new @population_size
-    @population.each_with_index do |hypothesis, index|
-      # Hypothesis is of the form: [rule, rule, rule, ...]
-      f = fitness(hypothesis)
-      puts "\tFitness of hypothesis is #{f} and of the best hypothesis is #{@best_fitness}" if $DEBUG
-      @best_fitness, @best_hypothesis = f , hypothesis.dup if f > @best_fitness
-			@current_fitness[index] = f
-		end
-		@current_fitness
-	end
-	
-	# Recibe el individuo con el cual se va a evaluar los ejemplos de entrenamiento
-  # fitness(h) = (correct(h))^2
-	def fitness(hypothesis)
-	  puts "\tStarting to calculate fitness of hypothesis with #{hypothesis.size} rules" if $DEBUG
-    (correct(hypothesis)) ** 2 - (@penalized_fitness ? hypothesis.size : 0)
-	end
-	
-	# Devuelve el porcentaje de ejemplos clasificados correctamente usando el conjunto
-	# de reglas h
-	def correct(hypothesis)
-	  correct = 0
-	  @training_examples.each do |example|
-	    # Example is of the form: [attr_rule, attr_rule, ...]
-	    correct += (match_example?(hypothesis, example) ? 1 : 0)
-	  end
-	  correct
-	end
-	
-	def match_example?(hypothesis, example)
-	  puts "\t\tStarting to compare example #{example.inspect} against hypothesis" if $DEBUG
-	  rules_matched = 0
-	  hypothesis.each do |rule|
-	    rule_match = match_rule?(rule, example)
-	    rules_matched += (rule_match ? 1 : 0)
-	    # Si hace match pero la salida es diferente, no es correcto
-	    return false if rule_match && rule.last != example.last
-	  end
-	  # Es correcto si al menos una regla hizo match
-    rules_matched > 0
-	end
-	
-	def match_rule?(rule, example)
-	  puts "\t\t\tStarting to compare example againts rule #{rule.inspect}" if $DEBUG
-	  example[(0..-2)].each_with_index do |attr_rule, index|
-	    return false unless match_attr_rule? rule[index], attr_rule
-	  end
-    true
-	end
-	
-	def match_attr_rule?(attr_rule_hypothesis, attr_rule_example)
-	  puts "\t\t\tComparing attr rule from hypothesis #{attr_rule_hypothesis.inspect} againts #{attr_rule_example}" if $DEBUG
-	  attr_rule_example.each_with_index do |elem, i|
-	    return false if elem == 1 && attr_rule_hypothesis[i] == 0
-	  end
-	  return true
-	end
 
 	def sturges
-		return (1 + log2(@population_size)).round
+		return (1 + 3.322*Math.log10(@population_size)).round
 	end
 
-	def load_examples(inputs, outputs, file_path, separator = ",")
+	def load_examples(inputs, file_path, separator = ",")
 
 		inputs = []
 		result = []
@@ -265,7 +203,7 @@ class Gabil
 				sturges.times do
 
 					if i[1].to_f >= p + h*j && i[1].to_f < p + h*(j+1)
-						tmp << Array.new(sturges - 1, 0)
+						tmp = Array.new(sturges - 1, 0)
 						tmp.insert(j, 1)
 						aux << tmp
 						break
@@ -289,7 +227,7 @@ class Gabil
 				sturges.times do
 
 					if i[2].to_f >= p + h*j && i[2].to_f < p + h*(j+1)
-						tmp << Array.new(sturges - 1, 0)
+						tmp = Array.new(sturges - 1, 0)
 						tmp.insert(j, 1)
 						aux << tmp
 						break
@@ -375,7 +313,7 @@ class Gabil
 				sturges.times do
 
 					if i[7].to_f >= p + h*j && i[7].to_f < p + h*(j+1)
-						tmp << Array.new(sturges - 1, 0)
+						tmp = Array.new(sturges - 1, 0)
 						tmp.insert(j, 1)
 						aux << tmp
 						break
@@ -419,7 +357,7 @@ class Gabil
 				sturges.times do
 
 					if i[10].to_f >= p + h*j && i[10].to_f < p + h*(j+1)
-						tmp << Array.new(sturges - 1, 0)
+						tmp = Array.new(sturges - 1, 0)
 						tmp.insert(j, 1)
 						aux << tmp
 						break
@@ -464,7 +402,7 @@ class Gabil
 				sturges.times do
 
 					if i[13].to_f >= p + h*j && i[13].to_f < p + h*(j+1)
-						tmp << Array.new(sturges - 1, 0)
+						tmp = Array.new(sturges - 1, 0)
 						tmp.insert(j, 1)
 						aux << tmp
 						break
@@ -488,7 +426,7 @@ class Gabil
 				sturges.times do
 
 					if i[14].to_f >= p + h*j && i[14].to_f < p + h*(j+1)
-						tmp << Array.new(sturges - 1, 0)
+						tmp = Array.new(sturges - 1, 0)
 						tmp.insert(j, 1)
 						aux << tmp
 						break
@@ -502,4 +440,68 @@ class Gabil
 		end
 
 	end
+	
+	private
+	
+	def calculate_fitness
+	  puts "Starting to calculate fitness of population" if $DEBUG
+	  @current_fitness ||= Array.new @population_size
+    @population.each_with_index do |hypothesis, index|
+      # Hypothesis is of the form: [rule, rule, rule, ...]
+      f = fitness(hypothesis)
+      puts "\tFitness of hypothesis is #{f} and of the best hypothesis is #{@best_fitness}" if $DEBUG
+      @best_fitness, @best_hypothesis = f , hypothesis.dup if f > @best_fitness
+			@current_fitness[index] = f
+		end
+		@current_fitness
+	end
+	
+	# Recibe el individuo con el cual se va a evaluar los ejemplos de entrenamiento
+  # fitness(h) = (correct(h))^2
+	def fitness(hypothesis)
+	  puts "\tStarting to calculate fitness of hypothesis with #{hypothesis.size} rules" if $DEBUG
+    (correct(hypothesis)) ** 2 - (@penalized_fitness ? hypothesis.size : 0)
+	end
+	
+	# Devuelve el porcentaje de ejemplos clasificados correctamente usando el conjunto
+	# de reglas h
+	def correct(hypothesis)
+	  correct = 0
+	  @training_examples.each do |example|
+	    # Example is of the form: [attr_rule, attr_rule, ...]
+	    correct += (match_example?(hypothesis, example) ? 1 : 0)
+	  end
+	  correct
+	end
+	
+	def match_example?(hypothesis, example)
+	  puts "\t\tStarting to compare example #{example.inspect} against hypothesis" if $DEBUG
+	  rules_matched = 0
+	  hypothesis.each do |rule|
+	    rule_match = match_rule?(rule, example)
+	    rules_matched += (rule_match ? 1 : 0)
+	    # Si hace match pero la salida es diferente, no es correcto
+	    return false if rule_match && rule.last != example.last
+	  end
+	  # Es correcto si al menos una regla hizo match
+    rules_matched > 0
+	end
+	
+	def match_rule?(rule, example)
+	  puts "\t\t\tStarting to compare example againts rule #{rule.inspect}" if $DEBUG
+	  example[(0..-2)].each_with_index do |attr_rule, index|
+	    return false unless match_attr_rule? rule[index], attr_rule
+	  end
+    true
+	end
+	
+	def match_attr_rule?(attr_rule_hypothesis, attr_rule_example)
+	  puts "\t\t\tComparing attr rule from hypothesis #{attr_rule_hypothesis.inspect} againts #{attr_rule_example}" if $DEBUG
+	  attr_rule_example.each_with_index do |elem, i|
+	    return false if elem == 1 && attr_rule_hypothesis[i] == 0
+	  end
+	  return true
+	end
+
+	
 end
