@@ -150,7 +150,11 @@ class Gabil
     add_alternative if @add_alternative
     
 	end
-	
+
+	def sturges
+		return (1 + 3.322*Math.log10(@population_size)).round
+	end
+
 	#private
 	
 	def calculate_fitness( p = @population )

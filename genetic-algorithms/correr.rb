@@ -1,11 +1,12 @@
-require './Gabil'
+require './gabil'
 
 begin
 
 	g = Gabil.new()
-	g.load_examples(g.inputs, g.outputs, "crx.data")
+	hola = []
+	g.load_examples(hola, "crx.data")
 
-	g.dropCondition(7)
+	#g.dropCondition(7)
 	
 
 end
