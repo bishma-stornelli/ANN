@@ -5,7 +5,12 @@ require './rule'
 
 @size_of_attr = [2,3,3,4,3,14, 9, 3, 2, 2, 3, 2, 3, 3, 3, 1]
 
+def sturges(x)
+    return (1 + 3.322*Math.log10(x)).round
+end
+
 def load_examples(file_path, separator = ",")
+
     inputs = []
     result = Population.new
     aux = []
@@ -17,20 +22,22 @@ def load_examples(file_path, separator = ",")
     a15 = []
 
     File.open(file_path, "r") do |infile|
-    while (line = infile.gets)
-      tmp = line.split(separator)
-      tmp.each_with_index do |e, i|
-        tmp[i] = e.to_f if [1,2,7,10,13,14].include? i
+      while (line = infile.gets)
+        tmp = line.split(separator)
+        tmp.each_with_index do |e, i|
+          tmp[i] = e.to_f if [1,2,7,10,13,14].include? i
+        end
+        inputs << tmp
+        a2 << tmp[1].to_f
+        a3 << tmp[2].to_f
+        a8 << tmp[7].to_f
+        a11 << tmp[10].to_f
+        a14 << tmp[13].to_f
+        a15 << tmp[14].to_f
       end
-      inputs << tmp
-      a2 << tmp[1].to_f
-      a3 << tmp[2].to_f
-      a8 << tmp[7].to_f
-      a11 << tmp[10].to_f
-      a14 << tmp[13].to_f
-      a15 << tmp[14].to_f
     end
-  end
+
+    sturges = sturges(inputs.length)
 
     inputs.each_with_index do |i, n|
 
@@ -38,9 +45,7 @@ def load_examples(file_path, separator = ",")
       tmp = []
 
       if i[0] == "?"
-
       else
-
         aux << case i[0]
           when "a" then [1,0]
           else [0,1]
@@ -48,15 +53,11 @@ def load_examples(file_path, separator = ",")
       end
 
       h = (a2.max - a2.min)/sturges
-
       p = a2.min
-
       j = 0
 
       if i[1] == "?"
-
       else
-
         sturges.times do
           if i[1].to_f >= p + h*j && i[1].to_f < p + h*(j+1)
             tmp = Array.new(sturges - 1, 0)
@@ -69,15 +70,11 @@ def load_examples(file_path, separator = ",")
       end
 
       h = (a3.max - a3.min)/sturges
-
       p = a3.min
-
       j = 0
-
       tmp = []
 
       if i[2] == "?"
-
       else
         sturges.times do
           if i[2].to_f >= p + h*j && i[2].to_f < p + h*(j+1)
@@ -91,9 +88,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[3] == "?"
-
       else
-
         aux << case i[3]
           when "u" then [1,0,0,0]
           when "y" then [0,1,0,0]
@@ -103,9 +98,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[4] == "?"
-
       else
-
         aux << case i[4]
           when "g" then [1,0,0]
           when "p" then [0,1,0]
@@ -114,9 +107,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[5] == "?"
-
       else
-
         aux << case i[5]
           when "c" then [1,0,0,0,0,0,0,0,0,0,0,0,0,0]
           when "d" then [0,1,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -136,9 +127,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[6] == "?"
-
       else
-
         aux << case i[6]
           when "v"  then [1,0,0,0,0,0,0,0,0]
           when "h"  then [0,1,0,0,0,0,0,0,0]
@@ -153,19 +142,13 @@ def load_examples(file_path, separator = ",")
       end
 
       h = (a8.max - a8.min)/sturges
-
       p = a8.min
-
       j = 0
-
       tmp = []
 
       if i[7] == "?"
-
       else
-
         sturges.times do
-
           if i[7].to_f >= p + h*j && i[7].to_f < p + h*(j+1)
             tmp = Array.new(sturges - 1, 0)
             tmp.insert(j, 1)
@@ -177,9 +160,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[8] == "?"
-
       else
-
         aux << case i[8]
           when "t" then [1,0]
           else [0,1]
@@ -187,9 +168,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[9] == "?"
-
       else
-
         aux << case i[9]
           when "f" then [1,0]
           else [0,1]
@@ -197,17 +176,11 @@ def load_examples(file_path, separator = ",")
       end
 
       h = (a11.max - a11.min)/sturges
-
       p = a11.min
-
       j = 0
-
       tmp = []
-
       if i[10] == "?"
-
       else
-
         sturges.times do
           if i[10].to_f >= p + h*j && i[10].to_f < p + h*(j+1)
             tmp = Array.new(sturges - 1, 0)
@@ -220,9 +193,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[11] == "?"
-
       else
-
         aux << case i[11]
           when "t" then [1,0]
           else [0,1]
@@ -230,9 +201,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[12] == "?"
-
       else
-
         aux << case i[12]
           when "g" then [1,0,0]
           when "p" then [0,1,0]
@@ -241,19 +210,13 @@ def load_examples(file_path, separator = ",")
       end
 
       h = (a14.max - a14.min)/sturges
-
       p = a14.min
-
       j = 0
-
       tmp = []
 
       if i[13] == "?"
-
       else
-
         sturges.times do
-
           if i[13].to_f >= p + h*j && i[13].to_f < p + h*(j+1)
             tmp = Array.new(sturges - 1, 0)
             tmp.insert(j, 1)
@@ -265,19 +228,13 @@ def load_examples(file_path, separator = ",")
       end
 
       h = (a15.max - a15.min)/sturges
-
       p = a15.min
-
       j = 0
-
       tmp = []
 
       if i[14] == "?"
-
       else
-
         sturges.times do
-
           if i[14].to_f >= p + h*j && i[14].to_f < p + h*(j+1)
             tmp = Array.new(sturges - 1, 0)
             tmp.insert(j, 1)
@@ -289,11 +246,9 @@ def load_examples(file_path, separator = ",")
       end
 
       aux << (i[15] =~ /\+/ ? [1] : [0])
-
-      population << aux
-
+      result << aux
     end
-    population
+    result
   end
 
 #############################################################################

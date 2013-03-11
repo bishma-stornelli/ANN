@@ -23,7 +23,7 @@ class Gabil
 	    :penalized_fitness => false,
 	    :selection_method => :roulette_wheel_selection
 	  }.merge(options)
-	  @population = population.dup
+	 	@population = population.dup
 		@population_size = population.size
 		@training_examples = training_examples
 		@mutation_rate = options[:mutation_rate]
