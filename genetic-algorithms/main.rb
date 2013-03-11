@@ -284,7 +284,7 @@ end
 def generate_random_population( size )
   population = Population.new
   size.times do
-    population << generate_random_hypothesis( 1 )
+    population << generate_random_hypothesis( rand(10) + 1 )
   end
   population
 end

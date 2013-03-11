@@ -56,7 +56,7 @@ class Hypothesis < Array
     offspring2.concat self.deep_flatten(point1, point2)
     offspring2.concat hypothesis.deep_flatten(point4)
 
-    os = [Hypothesis.build_from_attr_rule_sizes(attr_rule_sizes, offspring1),
+    [Hypothesis.build_from_attr_rule_sizes(attr_rule_sizes, offspring1),
       Hypothesis.build_from_attr_rule_sizes(attr_rule_sizes, offspring2)]
   end
 

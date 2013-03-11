@@ -108,8 +108,7 @@ class Gabil
 	end
 
   def crossover(parents)
-    offspring = []
-    puts "Se van a crear #{@parents_size} parejas"
+    offspring = Hypothesis.new
 
     parents.each do |parent1, parent2|
       offspring.concat(parent1.crossover_with(parent2))
