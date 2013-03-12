@@ -10,8 +10,8 @@ require 'benchmark'
 #   population[i][j] = j-esima regla del i-esimo individuo
 #   population[i][j][k] = k-esimo atributo de la j-esima regla del i-esimo individuo
 class Gabil
-	attr_accessor :population_size, :population, :new_population
-  attr_reader :best_hypothesis, :best_fitness
+	attr_accessor :population_size, :population
+  attr_reader :best_hypothesis, :best_fitness, :current_fitness
 	attr_accessor :selection_method, :mutation_rate, :crossover_rate
 
 	def initialize(population, training_examples, options = {} )
@@ -21,7 +21,8 @@ class Gabil
 	    :drop_condition => false,
 	    :add_alternative => false,
 	    :penalized_fitness => false,
-	    :selection_method => :roulette_wheel_selection
+	    :selection_method => :roulette_wheel_selection,
+	    :parent_number => 100
 	  }.merge(options)
 	 	@population = population.dup
 		@population_size = population.size
@@ -35,11 +36,12 @@ class Gabil
 		@best_hypothesis = []
 		@best_fitness = 0
 		@current_fitness = calculate_fitness
+		@parent_number = options[:parent_number]
 	end
 	
 	def evolve
   	Benchmark.bm do |x|
-  	  @new_population = Population.new
+  	  	@new_population = Population.new
       	x.report("selection"){ selection }
 	    x.report("crossover"){ crossover }
 	    x.report("mutate"){ mutate }
@@ -52,7 +54,7 @@ class Gabil
 	# Delega la funcionalidad de seleccion al metodo @selection_method, pasandole
 	# el numero de padres a elegir para aparearse
   def selection
-    send(@selection_method, ( (1 - @crossover_rate) * @population_size ).round)
+    send(@selection_method, ((@crossover_rate * @population_size)/2).round)
   end
   
   # Selecciona new_size individuos probabilisticamente segun el fitness
@@ -67,24 +69,57 @@ class Gabil
 		  probabilities = Array.new( @population_size , 1.0 / @population_size )
 		else
     	probabilities = @current_fitness.map{ |i| i / sum }
-    end
+    	end
 		
 		puts "probabilities of being selected: #{probabilities.inspect}" if $DEBUG
 		
-    new_size.times do 
-      # pick a random number and select the  h 
-      # corresponding to that roulette-wheel area
-      r , inc = rand * probabilities.max, 0 
-      @population.each_index do |i| 
-        if r < (inc += probabilities[i])
-          @new_population << @population.delete_at(i)
-          probabilities.delete_at(i)
-          break
-        end
-      end
-    end
-    puts "Hypothesis selected = #{@new_population.inspect}" if $DEBUG
-    @new_population
+	    new_size.times do 
+	      # pick a random number and select the  h 
+	      # corresponding to that roulette-wheel area
+	      r , inc = rand * probabilities.max, 0
+	      @population.each_index do |i| 
+	      	puts "i = " + i.to_s + " population = " + @population[i].to_s + "\n"
+	        if r < (inc += probabilities[i])
+	        	puts "tamano = " + @population.length.to_s + "\n"
+	        	puts "i = " + i.to_s + "\n"
+	          @new_population << @population.delete_at(i) #AQUI DICE QUE LO QUE QUIERE BORRAR ES NIL y no lo es =<
+	          probabilities.delete_at(i)
+	          break
+	        end
+	      end
+	    end
+	    puts "Hypothesis selected = #{@new_population.inspect}" if $DEBUG
+	    @new_population
+	end
+
+  # Selecciona new_size individuos probabilisticamente y selecciona el mejor
+  # fitness del grupo como padre. Los individuos seleccionados son eliminados de @population
+  # k es el numero de padres que se quieren seleccionar
+	def tournament_selection( new_size )
+
+		tournament = []
+		tournament_fitness = []
+
+		tournament_size = (@population_size/2)
+
+		puts @current_fitness.length
+
+		new_size.times do
+			tournament = []
+			tournament_fitness = []
+			tournament_size.times do
+				i = (@population_size*rand).round
+				tournament << @population.delete_at(i)
+				tournament_fitness << @current_fitness.delete_at(i)
+			end
+			
+			max = tournament_fitness.max
+			parent_index = tournament_fitness.index(max)
+			@new_population << tournament[parent_index]
+		end
+
+		puts "Hypothesis selected = #{@new_population.inspect}" if $DEBUG
+		@new_population
 	end
 
   # Selecciona new_size individuos de los cuales los new_size / 2 primeros son
@@ -149,10 +184,6 @@ class Gabil
     drop_condition if @drop_condition
     add_alternative if @add_alternative
     
-	end
-
-	def sturges
-		return (1 + 3.322*Math.log10(@population_size)).round
 	end
 
 	#private
