@@ -346,10 +346,13 @@ begin
 	#puts population[690]
 	gabil = Gabil.new(population, examples)
 	new_size = ((gabil.crossover_rate*gabil.population_size)/2.0).round
-	parents = gabil.roulette_wheel_selection(new_size)
+	
+  parents = gabil.tournament_selection(new_size)
 
-  puts "padres que quiero" + (new_size).to_s + "\n"
-  puts "padres seleccionados" + (parents.length).to_s + "\n"
+  parents = []
+
+  parents = gabil.roulette_wheel_selection(new_size)
+
 	 	
 	#while gabil.best_fitness < fitness_threshold
 	#	gabil.evolve

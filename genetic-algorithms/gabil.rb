@@ -11,7 +11,7 @@ require 'benchmark'
 #   population[i][j][k] = k-esimo atributo de la j-esima regla del i-esimo individuo
 class Gabil
 	attr_accessor :population_size, :population
-  attr_reader :best_hypothesis, :best_fitness, :current_fitness
+  	attr_reader :best_hypothesis, :best_fitness, :current_fitness
 	attr_accessor :selection_method, :mutation_rate, :crossover_rate
 
 	def initialize(population, training_examples, options = {} )
@@ -21,8 +21,7 @@ class Gabil
 	    :drop_condition => false,
 	    :add_alternative => false,
 	    :penalized_fitness => false,
-	    :selection_method => :roulette_wheel_selection,
-	    :parent_number => 100
+	    :selection_method => :roulette_wheel_selection
 	  }.merge(options)
 	 	@population = population.dup
 		@population_size = population.size
@@ -36,7 +35,6 @@ class Gabil
 		@best_hypothesis = []
 		@best_fitness = 0
 		@current_fitness = calculate_fitness
-		@parent_number = options[:parent_number]
 	end
 	
 	def evolve
@@ -73,23 +71,24 @@ class Gabil
 		
 		puts "probabilities of being selected: #{probabilities.inspect}" if $DEBUG
 		
-	    new_size.times do 
-	      # pick a random number and select the  h 
-	      # corresponding to that roulette-wheel area
-	      r , inc = rand * probabilities.max, 0
-	      @population.each_index do |i| 
-	      	puts "i = " + i.to_s + " population = " + @population[i].to_s + "\n"
-	        if r < (inc += probabilities[i])
-	        	puts "tamano = " + @population.length.to_s + "\n"
-	        	puts "i = " + i.to_s + "\n"
-	          @new_population << @population.delete_at(i) #AQUI DICE QUE LO QUE QUIERE BORRAR ES NIL y no lo es =<
-	          probabilities.delete_at(i)
-	          break
+	    parents = []
+        selected_indexes = []
+        new_size.times do # new_size indica el numero de parejas que vamos a seleccionar
+      # pick a random number and select the  h 
+      # corresponding to that roulette-wheel area
+	    	couple = Hypothesis.new
+	       	r , inc = rand * probabilities.max, 0
+	        @population.each_index do |i| 
+	          if r < (inc += probabilities[i])
+	            next if selected_indexes.include? i # Evita que seleccione 2 veces el mismo individuo
+		        couple << @population[i]
+		        selected_indexes << i
+		        break
+	          end
 	        end
-	      end
-	    end
-	    puts "Hypothesis selected = #{@new_population.inspect}" if $DEBUG
-	    @new_population
+        	parents << couple
+      	end
+      parents
 	end
 
   # Selecciona new_size individuos probabilisticamente y selecciona el mejor
@@ -97,29 +96,28 @@ class Gabil
   # k es el numero de padres que se quieren seleccionar
 	def tournament_selection( new_size )
 
-		tournament = []
-		tournament_fitness = []
+		tournament = Hypothesis.new
+		tournament_fitness = Hypothesis.new
+		parents = []
 
 		tournament_size = (@population_size/2)
-
-		puts @current_fitness.length
 
 		new_size.times do
 			tournament = []
 			tournament_fitness = []
 			tournament_size.times do
-				i = (@population_size*rand).round
-				tournament << @population.delete_at(i)
-				tournament_fitness << @current_fitness.delete_at(i)
+				i = ((@population_size-1)*rand).round
+				tournament << @population[i]
+				tournament_fitness << @current_fitness[i]
 			end
 			
 			max = tournament_fitness.max
 			parent_index = tournament_fitness.index(max)
-			@new_population << tournament[parent_index]
+			parents << tournament[parent_index]
 		end
 
-		puts "Hypothesis selected = #{@new_population.inspect}" if $DEBUG
-		@new_population
+		puts "Hypothesis selected = #{parents.inspect}" if $DEBUG
+		parents
 	end
 
   # Selecciona new_size individuos de los cuales los new_size / 2 primeros son
