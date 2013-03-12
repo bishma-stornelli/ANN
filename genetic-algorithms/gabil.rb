@@ -142,8 +142,13 @@ class Gabil
     @new_population
 	end
 
-  def crossover
-  
+  def crossover(parents)
+    offspring = Hypothesis.new
+
+    parents.each do |parent1, parent2|
+      offspring.concat(parent1.crossover_with(parent2))
+    end
+    offspring
   end
 
 	def add_alternative(attribute)
