@@ -12,7 +12,7 @@ require 'benchmark'
 class Gabil
 	attr_accessor :population_size, :population
   	attr_reader :best_hypothesis, :best_fitness, :current_fitness
-	attr_accessor :parent_selection_method, :survivor_selection_method, :mutation_rate, :crossover_rate
+	attr_accessor :parent_selection_method, :survivor_selection_method, :mutation_rate, :crossover_rate, :new_population
 
 	def initialize(population, training_examples, options = {} )
 	  options = {
@@ -27,6 +27,7 @@ class Gabil
 	 	@population = population.dup
 		@population_size = population.size
 		@training_examples = training_examples
+		@new_population = Population.new
 		@mutation_rate = options[:mutation_rate]
 		@crossover_rate = options[:crossover_rate]
 		@drop_condition = options[:drop_condition]
@@ -59,7 +60,7 @@ class Gabil
   
   # Selecciona new_size individuos probabilisticamente segun el fitness
   # que aporta a la suma de fitness de toda la poblacion. Los individuos seleccionados
-  # son eliminados de @population
+  # NO son eliminados de @population
 	def roulette_wheel_selection( new_size )
 	
 		sum = @current_fitness.inject(0.0){ |res, item| res + item }
@@ -73,8 +74,7 @@ class Gabil
 		
 		puts "probabilities of being selected: #{probabilities.inspect}" if $DEBUG
 		
-	    parents = []
-        selected_indexes = []
+	    parents = Population.new
         new_size.times do # new_size indica el numero de parejas que vamos a seleccionar
       # pick a random number and select the  h 
       # corresponding to that roulette-wheel area
@@ -82,9 +82,7 @@ class Gabil
 	       	r , inc = rand * probabilities.max, 0
 	        @population.each_index do |i| 
 	          if r < (inc += probabilities[i])
-	            next if selected_indexes.include? i # Evita que seleccione 2 veces el mismo individuo
 		        couple << @population[i]
-		        selected_indexes << i
 		        break
 	          end
 	        end
@@ -94,13 +92,13 @@ class Gabil
 	end
 
   # Selecciona new_size individuos probabilisticamente y selecciona el mejor
-  # fitness del grupo como padre. Los individuos seleccionados son eliminados de @population
-  # k es el numero de padres que se quieren seleccionar
+  # fitness del grupo como padre. Los individuos seleccionados NO son eliminados de 
+  # @population. k es el numero de padres que se quieren seleccionar
 	def tournament_selection( new_size )
 
 		tournament = Hypothesis.new
 		tournament_fitness = Hypothesis.new
-		parents = []
+		parents = Population.new
 
 		tournament_size = (@population_size/2)
 
@@ -125,35 +123,29 @@ class Gabil
   # Selecciona new_size individuos de los cuales los new_size / 2 primeros son
   # aquellos con mejor fitness y los restantes son seleccionados aleatoriamente.
   # Elimina los elementos seleccionados de @population
-	def elitist_selection( new_size )
+	def elitist_selection
     
 	    sorted_population = @population.sort do |a, b| 
 	      @current_fitness[@population.index(a)] <=> @current_fitness[@population.index(b)]
 	    end
 
-	    puts sorted_population.class, sorted_population.methods.include?(:<<)
+	    puts @new_population.class, @new_population.methods.include?(:<<)
 
-	    puts "tam " + sorted_population.length.to_s + "\n"
-
-	    n = new_size / 2
+	    n = @population_size / 2
 	    
-	    (new_size / 2).times do
+	    (@population_size / 2).times do
 	    	@new_population << sorted_population.delete_at(0)
 	    end
-
-	    puts "tam 2" + @population.length.to_s + "\n"
 	    
-	    while(@new_population.size < new_size )
+	    while(@new_population.size < @population_size )
 	      @new_population << sorted_population.delete_at( rand( sorted_population.size - 1 ) )
 	    end
-	    
-	    @new_population
 	end
 
 	# Selecciona new_size individuos probabilisticamente segun el fitness
   # que aporta a la suma de fitness de toda la poblacion. Los individuos seleccionados
   # son eliminados de @population
-	def survivor_roulette_wheel_selection( new_size )
+	def survivor_roulette_wheel_selection
 	
 		sum = @current_fitness.inject(0.0){ |res, item| res + item }
 		if sum == 0 
@@ -166,24 +158,19 @@ class Gabil
 		
 		puts "probabilities of being selected: #{probabilities.inspect}" if $DEBUG
 		
-	    parents = []
-        selected_indexes = []
-        new_size.times do # new_size indica el numero de parejas que vamos a seleccionar
+        @population_size.times do # new_size indica el numero de parejas que vamos a seleccionar
       # pick a random number and select the  h 
       # corresponding to that roulette-wheel area
 	    	couple = Hypothesis.new
 	       	r , inc = rand * probabilities.max, 0
 	        @population.each_index do |i| 
 	          if r < (inc += probabilities[i])
-	            next if selected_indexes.include? i # Evita que seleccione 2 veces el mismo individuo
 		        couple << @population[i]
-		        selected_indexes << i
 		        break
 	          end
 	        end
-        	parents << couple
+        	@new_population << couple
       	end
-      parents
 	end
 
   def crossover(parents)

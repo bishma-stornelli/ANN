@@ -361,15 +361,11 @@ begin
 	population = generate_random_population( population_size )
   test = split_population_training_test(0.7, examples)
 	gabil = Gabil.new(population, examples)
-	new_size = ((gabil.crossover_rate*gabil.population_size)/2.0).round
-	
-  survivors = gabil.elitist_selection(200)
+	new_size = ((gabil.crossover_rate*gabil.population_size)/2)
 
-  puts "survivors = " + survivors.length.to_s + "\n"
+  gabil.survivor_roulette_wheel_selection
 
-  parents = []
-
-  parents = gabil.roulette_wheel_selection(new_size)
+  puts "survivors = " + gabil.new_population.length.to_s + "\n"
 
 	
 	#while gabil.best_fitness < fitness_threshold

@@ -45,6 +45,7 @@ def load_examples(file_path, separator = ",")
       tmp = []
 
       if i[0] == "?"
+        aux << Array.new(@size_of_attr[0], 1)
       else
         aux << case i[0]
           when "a" then [1,0]
@@ -57,6 +58,7 @@ def load_examples(file_path, separator = ",")
       j = 0
 
       if i[1] == "?"
+        aux << Array.new(@size_of_attr[1], 1)
       else
         sturges.times do
           if i[1].to_f >= p + h*j && i[1].to_f < p + h*(j+1)
@@ -75,6 +77,7 @@ def load_examples(file_path, separator = ",")
       tmp = []
 
       if i[2] == "?"
+        aux << Array.new(@size_of_attr[2], 1)
       else
         sturges.times do
           if i[2].to_f >= p + h*j && i[2].to_f < p + h*(j+1)
@@ -88,6 +91,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[3] == "?"
+        aux << Array.new(@size_of_attr[3], 1)
       else
         aux << case i[3]
           when "u" then [1,0,0,0]
@@ -98,6 +102,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[4] == "?"
+        aux << Array.new(@size_of_attr[4], 1)
       else
         aux << case i[4]
           when "g" then [1,0,0]
@@ -107,6 +112,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[5] == "?"
+        aux << Array.new(@size_of_attr[5], 1)
       else
         aux << case i[5]
           when "c" then [1,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -127,6 +133,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[6] == "?"
+        aux << Array.new(@size_of_attr[6], 1)
       else
         aux << case i[6]
           when "v"  then [1,0,0,0,0,0,0,0,0]
@@ -147,6 +154,7 @@ def load_examples(file_path, separator = ",")
       tmp = []
 
       if i[7] == "?"
+        aux << Array.new(@size_of_attr[7], 1)
       else
         sturges.times do
           if i[7].to_f >= p + h*j && i[7].to_f < p + h*(j+1)
@@ -160,6 +168,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[8] == "?"
+        aux << Array.new(@size_of_attr[8], 1)
       else
         aux << case i[8]
           when "t" then [1,0]
@@ -168,6 +177,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[9] == "?"
+        aux << Array.new(@size_of_attr[9], 1)
       else
         aux << case i[9]
           when "f" then [1,0]
@@ -179,7 +189,9 @@ def load_examples(file_path, separator = ",")
       p = a11.min
       j = 0
       tmp = []
+
       if i[10] == "?"
+        aux << Array.new(@size_of_attr[10], 1)
       else
         sturges.times do
           if i[10].to_f >= p + h*j && i[10].to_f < p + h*(j+1)
@@ -193,6 +205,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[11] == "?"
+        aux << Array.new(@size_of_attr[11], 1)
       else
         aux << case i[11]
           when "t" then [1,0]
@@ -201,6 +214,7 @@ def load_examples(file_path, separator = ",")
       end
 
       if i[12] == "?"
+        aux << Array.new(@size_of_attr[12], 1)
       else
         aux << case i[12]
           when "g" then [1,0,0]
@@ -215,6 +229,7 @@ def load_examples(file_path, separator = ",")
       tmp = []
 
       if i[13] == "?"
+        aux << Array.new(@size_of_attr[13], 1)
       else
         sturges.times do
           if i[13].to_f >= p + h*j && i[13].to_f < p + h*(j+1)
@@ -233,6 +248,7 @@ def load_examples(file_path, separator = ",")
       tmp = []
 
       if i[14] == "?"
+        aux << Array.new(@size_of_attr[14], 1)
       else
         sturges.times do
           if i[14].to_f >= p + h*j && i[14].to_f < p + h*(j+1)
@@ -287,6 +303,18 @@ def generate_random_population( size )
     population << generate_random_hypothesis( rand(10) + 1 )
   end
   population
+end
+
+def split_population_training_test( percentage, training )
+  n = (training.length*percentage).round
+  test = []
+
+  n.times do
+    i = rand(training.length - 1)
+    test << training.delete_at(i)
+  end
+
+  test
 end
 
 ##################################################################################
