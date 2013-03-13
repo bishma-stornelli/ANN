@@ -338,22 +338,40 @@ def generate_random_population( size )
   population
 end
 
+#############################################################################
+##### FUNCION PARA DIVIDIR LA POBLACION EN ENTRENAMIENTO Y PRUEBA ###########
+#############################################################################
+
+def split_population_training_test( percentage, training )
+  n = (training.length*percentage).round
+  test = []
+
+  n.times do
+    i = rand(training.length - 1)
+    test << training.delete_at(i)
+  end
+
+  test
+end
+
 begin
 
 	population_size = 690
 	examples = load_examples("crx.data")
 	population = generate_random_population( population_size )
-	#puts population[690]
+  test = split_population_training_test(0.7, examples)
 	gabil = Gabil.new(population, examples)
 	new_size = ((gabil.crossover_rate*gabil.population_size)/2.0).round
 	
-  parents = gabil.tournament_selection(new_size)
+  survivors = gabil.elitist_selection(200)
+
+  puts "survivors = " + survivors.length.to_s + "\n"
 
   parents = []
 
   parents = gabil.roulette_wheel_selection(new_size)
 
-	 	
+	
 	#while gabil.best_fitness < fitness_threshold
 	#	gabil.evolve
 	#end
