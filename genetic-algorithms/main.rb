@@ -366,7 +366,23 @@ begin
   #     :survivor_selection_method => :survivor_roulette_wheel_selection
   #   )
   # end
-  #run += 10
+  run += 10
+
+  # 10.times do |i|
+  #   new_run(i + run, training_data, 
+  #     :parent_selection_method => :tournament_selection,
+  #     :survivor_selection_method => :elitist_selection
+  #   )
+  # end
+  # run += 10
+
+  # 10.times do |i|
+  #   new_run(i + run, training_data, 
+  #     :parent_selection_method => :tournament_selection,
+  #     :survivor_selection_method => :survivor_roulette_wheel_selection
+  #   )
+  # end
+  # run += 10
 
   # 10.times do |i|
   #   new_run(i + run, training_data, 
