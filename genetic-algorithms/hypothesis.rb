@@ -35,8 +35,11 @@ class Hypothesis < Array
     rs = rule_size()
 
     # Selecciono dos puntos en el self para hacer crossover
-    point1 , point2 = [rand(ds), rand(ds)].sort
-    d1, d2 = point1 % rs, point2 % rs
+    while( true)
+      point1 , point2 = [rand(ds), rand(ds)].sort
+      d1, d2 = point1 % rs, point2 % rs
+      break unless d1 >= d2 && hypothesis.size == 1        
+    end
 
     point3, point4 = 0, 0
 
@@ -44,8 +47,9 @@ class Hypothesis < Array
       point3 = d1 + rs * rand(hypothesis.size)
       point4 = point3 - d1 + d2  + rs * rand(hypothesis.size - (point3 / rs))
     else
-      point3 = d1 + rs * rand(hypothesis.size - 1).round
-      point4 = (point3 - d1 + rs) + d2 + rs * rand(hypothesis.size - ((point3 + rs) / rs))
+      # Si hypothesis.size == 1, no hay punto 3 y 4 factible... REVISAR
+      point3 = d1 + rs * (hypothesis.size == 1 ? 0 : rand(hypothesis.size - 1).round)
+      point4 = (point3 - d1 + rs) + d2 + rs * (hypothesis.size == 1 ? 0 : rand(hypothesis.size - ((point3 + rs) / rs)))
     end
 
     offspring1.concat self.deep_flatten(0, point1)
@@ -63,12 +67,16 @@ class Hypothesis < Array
   def deep_flatten(bit1 = 0, bit2 = deep_size)
     return [] if empty? || bit2 < bit1
 
-    flat = []
-    starting_rule = bit1 / first.deep_size  rescue 0
-    starting_attr_rule = bit1 % first.deep_size rescue 0
+    #puts "deep_flatten from #{bit1} to #{bit2}"
 
-    ending_rule = bit2 / first.deep_size rescue 0
-    ending_attr_rule = bit2 % first.deep_size rescue 0
+    flat = []
+    starting_rule = bit1 / rule_size  rescue 0
+    starting_attr_rule = bit1 % rule_size rescue 0
+
+    ending_rule = bit2 / rule_size rescue 0
+    ending_attr_rule = bit2 % rule_size rescue 0
+
+    #puts "Rule #{starting_rule} through #{ending_rule}. Total rules #{size}"
 
     if starting_rule != ending_rule
       flat.concat send(:[], starting_rule).deep_flatten(starting_attr_rule)

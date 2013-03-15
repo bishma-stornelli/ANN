@@ -2,6 +2,7 @@ require './gabil'
 require './population'
 require './hypothesis'
 require './rule'
+require 'benchmark'
 
 @size_of_attr = [2,3,3,4,3,14, 9, 3, 2, 2, 3, 2, 3, 3, 3, 1]
 
@@ -300,7 +301,7 @@ end
 def generate_random_population( size )
   population = Population.new
   size.times do
-    population << generate_random_hypothesis( rand(10) + 1 )
+    population << generate_random_hypothesis( rand(15) + 1 )
   end
   population
 end
@@ -310,7 +311,7 @@ def split_population_training_test( percentage, training )
   test = []
 
   n.times do
-    i = rand(training.length - 1)
+    i = rand(training.length)
     test << training.delete_at(i)
   end
 
@@ -321,34 +322,104 @@ end
 ####### ENTRENAR HASTA QUE SE CLASIFIQUEN SUFICIENTES EJEMPLOS CORRECTAMENTE #####
 ##################################################################################
 
-=begin
-begin
+def new_run(run, training_data, options={})
+  gabil = nil
+  bm = Benchmark.measure do
+    population = generate_random_population(100)
+    gabil = Gabil.new population, training_data, options
+    log_file = File.new("outputs/#{run}", "w")
+    log_file.puts("#{gabil.current_iteration},#{gabil.best_accuracy}")
+    init_time = Time.now
+    time_elapsed = Time.now - init_time
+    while gabil.best_accuracy < 0.95 && gabil.current_iteration < 100 && time_elapsed < 300
+      puts "Evolving run #{run}, fitness = #{gabil.best_fitness}, iteration = #{gabil.current_iteration}"
+      gabil.evolve
+      log_file.puts("#{gabil.current_iteration},#{gabil.best_accuracy}")
+      time_elapsed = Time.now - init_time
+    end
+    log_file.close
+  end
 
-  [:roulette_wheel_selection, :elitist_selection].each do |selection_method|
-    # Seleccionar mejor configuracion del metodo de seleccion
+  File.open("resumen", "a") do |f|
+    f.puts("#{run}: #{gabil.best_accuracy}, #{gabil.current_iteration}, #{gabil.mutation_rate}, #{gabil.crossover_rate}, #{gabil.drop_condition}, #{gabil.add_alternative}, #{gabil.penalized_fitness}, #{gabil.parent_selection_method}, #{gabil.survivor_selection_method}, #{bm.real}, #{gabil.best_hypothesis.inspect}" )
   end
-  
-  [0.001, 0.005, 0.01, 0.05, 0.1, 0.2].each do |mutation_rate|
-    [0.4, 0.6, 0.8, 1.0].each do |crossover_rate|
-      next if mutation_rate == 0.001 && crossover_rate == 0.6 # Configuracion por defecto, ya se eligio de arriba
-      # Seleccionar mejor par (mutation_rate, crossover_rate) usando el mejor metodo de seleccion
-    end
+end
+
+begin
+  training_data = load_examples('crx.data')
+  testing_data = split_population_training_test(0.7, training_data)
+
+  puts training_data.count{|e| e.last == [1]}, training_data.count{|e| e.last == [0]}
+
+  run = 0
+
+  # 10.times do |i|
+  #   new_run(i, training_data, 
+  #     :parent_selection_method => :roulette_wheel_selection,
+  #     :survivor_selection_method => :elitist_selection
+  #   )
+  # end
+  run += 10
+  #run += 10.times do |i|
+  #   new_run(i + 10, training_data, 
+  #     :parent_selection_method => :roulette_wheel_selection,
+  #     :survivor_selection_method => :survivor_roulette_wheel_selection
+  #   )
+  # end
+  run += 10
+
+  10.times do |i|
+    new_run(i + run, training_data, 
+      :parent_selection_method => :tournament_selection,
+      :survivor_selection_method => :elitist_selection
+    )
   end
-  
-  [false, true].each do |drop_condition|
-    [false, true].each do |add_alternative|
-      next unless drop_condition || add_alternative # both false is default configuration
-      # Ver si drop_condition o add_alternative logran mejorar el resultado
-    end
+  run += 10
+
+  10.times do |i|
+    new_run(i + run, training_data, 
+      :parent_selection_method => :tournament_selection,
+      :survivor_selection_method => :survivor_roulette_wheel_selection
+    )
   end
+  run += 10
+
+
+  #return
   
-  examples = load_examples("crx.data")
-  population = generate_random_population( population_size )
-  gabil = Gabil.new(population)
+  # 10.times do |i|
+  #   new_run(i + run, training_data, 
+  #     :parent_selection_method => :tournament_selection,
+  #     :survivor_selection_method => :survivor_roulette_wheel_selection,
+  #     :mutation_rate => 0.001
+  #   )
+  # end
+  # [0.001, 0.01, 0.1, 0.2].each do |mutation_rate|
+  #   [0.4, 0.6, 0.8, 1.0].each do |crossover_rate|
+  #     next if mutation_rate == 0.1 && crossover_rate == 0.6 # Configuracion por defecto, ya se eligio de arriba
+  #     new_run(run, training_data, 
+  #       :parent_selection_method => :tournament_selection,
+  #       :survivor_selection_method => :survivor_roulette_wheel_selection,
+  #       :mutation_rate => mutation_rate,
+  #       :crossover_rate => crossover_rate
+  #     )
+  #     run += 1
+  #   end
+  # end
+ # 
+ # [false, true].each do |drop_condition|
+ #   [false, true].each do |add_alternative|
+ #     next unless drop_condition || add_alternative # both false is default configuration
+ #     # Ver si drop_condition o add_alternative logran mejorar el resultado
+ #   end
+ # end
   
-  while gabil.best_fitness < fitness_threshold
-    gabil.evolve
-  end
+ # examples = load_examples("crx.data")
+ # population = generate_random_population( population_size )
+ # gabil = Gabil.new(population)
+ # 
+  #while gabil.best_fitness < fitness_threshold
+  #  gabil.evolve
+  #end
 
 end
-=end
