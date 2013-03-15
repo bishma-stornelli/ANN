@@ -213,7 +213,7 @@ class Gabil
   end
 
 	def add_alternative_on_population p
-		mutated_population = p.sample( (0.01 * p.size).round )
+		mutated_population = p.sample( (@mutation_rate * p.size).round )
 
 		mutated_population.each do |hypothesis|
 			random_attr = random_attr(hypothesis)
@@ -222,7 +222,7 @@ class Gabil
 	end
 
 	def drop_condition_on_population p
-		mutated_population = p.sample( (0.6 * p.size).round )
+		mutated_population = p.sample( (@mutation_rate * p.size).round )
 
 		mutated_population.each do |hypothesis|
 		
