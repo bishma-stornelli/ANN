@@ -17,8 +17,7 @@ def process_configuration_line(line)
     penalized_fitness: penalized_fitness,
     parent_selection_method: parent_selection_method,
     survivor_selection_method: survivor_selection_method,
-    time_running: time_running.to_f,
-    hypothesis: best_hypothesis
+    time_running: time_running.to_f
   }
   result
 end
@@ -35,37 +34,58 @@ def index_of_best(conf)
   best_index
 end
 
+def mean_accuracy(conf)
+  sum = 0.0
+  conf.each do |number, data|
+    sum += data[:accuracy]
+  end
+  sum / conf.size
+end
+
+configurations = 4
+offset = 1
+
 configuration = {1 => {}, 2 => {}, 3 => {}, 4 => {}}
 File.open("resumen", "r") do |f|
-  20.times do |i|
-    line = f.gets
+  while(line = f.gets)
     conf = process_configuration_line(line)
-    configuration[conf[:number] / 10 + 1][conf[:number]] = conf[:data]
+    configuration[conf[:number] / 10 + offset] ||= {}
+    configuration[conf[:number] / 10 + offset][conf[:number]] = conf[:data]
   end
 end
 
-2.times do |i|
-  configuration[i + 1][:best] = { 
-    :index => index_of_best(configuration[i + 1]) ,
+configurations.times do |i|
+  configuration[i + offset][:best] = { 
+    :index => index_of_best(configuration[i + offset]) ,
     :iterations => [] ,
-    :accuracies => []
+    :accuracies => [] ,
+    :mean_accuracy => mean_accuracy(configuration[i + offset]) * 100
   }
-  filename = "outputs/#{configuration[i+1][:best][:index]}"
+  filename = "outputs/#{configuration[i+offset][:best][:index]}"
   CSV.foreach(filename) do |row|
-    configuration[i+1][:best][:iterations] << row[0].to_i
-    configuration[i+1][:best][:accuracies] << row[1].to_f
+    configuration[i+offset][:best][:iterations] << row[0].to_i
+    configuration[i+offset][:best][:accuracies] << row[1].to_f * 100
   end
+  puts "Best for #{i + offset} = #{configuration[i + offset][:best][:accuracies].max}"
+  puts "Mean for #{i + offset} = #{configuration[i + offset][:best][:mean_accuracy]}"
 end
 
 g = Gruff::Line.new
-g.title = "Fase 1" 
+g.title = "Fase 1"
+g.replace_colors ['#ff0000', '#ff8888', 
+                  '#00ff00', '#88ff88', 
+                  '#0000ff', '#8888ff', 
+                  '#ffff00', '#ffff88', 
+                  '#ff00ff', '#ff88ff',
+                  '#00ffff', '#88ffff']                  
+g.dot_radius = 0
+configurations.times do |i|
+  g.data("C#{i + offset} best", configuration[i + offset][:best][:accuracies])
+  g.data("C#{i + offset} mean", [configuration[i + offset][:best][:mean_accuracy]] * 100)
+end
 
-g.data("Configuración 1", configuration[1][:best][:accuracies])
-g.data("Configuración 2", configuration[2][:best][:accuracies])
-#g.data("Configuración 3", configuration[3][:best][:accuracies])
-#g.data("Configuración 4", configuration[4][:best][:accuracies])
 g.x_axis_label = "Iteraciones"
-g.y_axis_label = "Precisión"
+g.y_axis_label = "Precisión (%%)"
 g.labels = {0 => "1", 24 => "25", 49 => "50", 74 => "75", 99 => "100"}
 
 g.write('fase1.png')
