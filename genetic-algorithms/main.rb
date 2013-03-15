@@ -359,7 +359,7 @@ begin
   #     :survivor_selection_method => :elitist_selection
   #   )
   # end
-  run += 10
+  #run += 10
   #run += 10.times do |i|
   #   new_run(i + 10, training_data, 
   #     :parent_selection_method => :roulette_wheel_selection,
@@ -384,28 +384,74 @@ begin
   # end
   # run += 10
 
-
-  #return
-  
   # 10.times do |i|
   #   new_run(i + run, training_data, 
   #     :parent_selection_method => :tournament_selection,
-  #     :survivor_selection_method => :survivor_roulette_wheel_selection,
-  #     :mutation_rate => 0.001
+  #     :survivor_selection_method => :elitist_selection
   #   )
   # end
-  # [0.001, 0.01, 0.1, 0.2].each do |mutation_rate|
-  #   [0.4, 0.6, 0.8, 1.0].each do |crossover_rate|
-  #     next if mutation_rate == 0.1 && crossover_rate == 0.6 # Configuracion por defecto, ya se eligio de arriba
-  #     new_run(run, training_data, 
-  #       :parent_selection_method => :tournament_selection,
-  #       :survivor_selection_method => :survivor_roulette_wheel_selection,
-  #       :mutation_rate => mutation_rate,
-  #       :crossover_rate => crossover_rate
-  #     )
-  #     run += 1
+  #run += 10
+
+  # 10.times do |i|
+  #   new_run(i + run, training_data, 
+  #     :parent_selection_method => :tournament_selection,
+  #     :survivor_selection_method => :survivor_roulette_wheel_selection
+  #   )
+  # end
+  #run += 10
+
+  # 0.001, 0.4 => 40
+  # 0.001, 0.6 => 50
+  # 0.001, 0.8 => 60
+  # 0.001, 1.0 => 70
+
+  # 0.01, 0.4 => 80
+  # 0.01, 0.6 => 90
+  # 0.01, 0.8 => 100
+  # 0.01, 1.0 => 110
+
+  # 0.1, 0.4 => 120
+  # 0.1, 0.8 => 130
+  # 0.1, 1.0 => 140
+
+  # 0.2, 0.4 => 150
+  # 0.2, 0.6 => 160
+  # 0.2, 0.8 => 170
+  # 0.2, 1.0 => 180
+
+  # Run 40 - 79
+  run = 120
+  [0.1].each do |mutation_rate|
+    [0.4, 0.6, 0.8, 1.0].each do |crossover_rate|
+      next if mutation_rate == 0.1 && crossover_rate == 0.6 # Configuracion por defecto, ya se eligio de arriba
+      10.times do
+        new_run(run, training_data, 
+        :parent_selection_method => :tournament_selection,
+        :survivor_selection_method => :survivor_roulette_wheel_selection,
+        :mutation_rate => mutation_rate,
+        :crossover_rate => crossover_rate
+        )
+        run += 1
+      end
+    end
+  end # Comentar para evaluar fase 3
+  # run += 160 # Descomentar para evaluar fase 3
+ 
+  # [false, true].each do |drop_condition|
+  #   [false, true].each do |add_alternative|
+  #     [false, true].each do |penalized_fitness|
+  #       next unless drop_condition || add_alternative || penalized_fitness
+  #       new_run(run, training_data, 
+  #         :parent_selection_method => :tournament_selection,
+  #         :survivor_selection_method => :survivor_roulette_wheel_selection,
+  #         :mutation_rate => mutation_rate,
+  #         :crossover_rate => crossover_rate
+  #       )
+  #       run += 1
+  #     end
   #   end
   # end
+
  # 
  # [false, true].each do |drop_condition|
  #   [false, true].each do |add_alternative|
@@ -517,5 +563,4 @@ begin
   #    end
   #  end
   # end
-
 end
